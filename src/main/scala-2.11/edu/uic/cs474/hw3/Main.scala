@@ -1,10 +1,14 @@
 package edu.uic.cs474.hw3
 
+import akka.actor.{ActorSystem, Props}
+
 /**
-  * Created by andrea on 22/10/16.
+  * The entry point of the application
   */
 object Main extends App {
 
   println("Hello World")
 
+  val system = ActorSystem("GithubAnalyzer")
+  val master = system.actorOf(Props[Master])
 }
