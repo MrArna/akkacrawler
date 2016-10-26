@@ -6,15 +6,15 @@ package edu.uic.cs474.hw3
 object Config {
 
   //Maximum number of project handlers to instantiated
-  var _maxProjectHandlers:Int = _
+  private var _maxProjectHandlers:Int = _
   //Maximum number of project parsers to be instantiated by a single project handler
-  var _maxProjectParsers:Int = _
+  private var _maxProjectParsers:Int = _
   //The total number of projects to be downloaded
-  var _numProjects:Int = _
+  private var _numProjects:Int = _
   //The language that projects to be downloaded should be written in
-  var _language:String = _
+  private var _language:String = _
   //The main folder where downloaded and temporary files should be created
-  var _mainFolder:String = _
+  private var _mainFolder:String = _
 
   //Getters
   def maxProjectHandlers = _maxProjectHandlers
