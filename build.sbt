@@ -26,4 +26,4 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 
 parallelExecution in Test := false
 
-mainClass in assembly := Some("edu.uic.cs474.hw3.Main")
+//mainClass in assembly := Some("edu.uic.cs474.hw3.Main")

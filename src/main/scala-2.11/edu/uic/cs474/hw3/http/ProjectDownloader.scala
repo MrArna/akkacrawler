@@ -2,13 +2,12 @@ package edu.uic.cs474.hw3.http
 
 import akka.NotUsed
 import akka.actor.{Actor, ActorLogging}
-import akka.http.impl.engine.parsing.BodyPartParser.ParseError
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, HttpResponse}
 import akka.stream.scaladsl.{Flow, Keep, RunnableGraph, Sink, Source}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import akka.util.ByteString
-import edu.uic.cs474.hw3.messages.{Parse, Start}
+import edu.uic.cs474.hw3.messages.{CheckoutVersion, Start}
 import org.json4s.JsonAST.JArray
 
 import scala.concurrent.duration.Duration
@@ -75,7 +74,8 @@ class ProjectDownloader extends Actor with ActorLogging
     for (url <- (urls \ "clone_url").values.asInstanceOf[List[String]])
     {
       "git clone " + url  + " " + keyword + index !!;
-      sender ! Parse(keyword + index, keyword + index)
+      //TODO
+      //sender ! CheckoutVersion(keyword + index, keyword + index)
       index = index + 1
     }
 
