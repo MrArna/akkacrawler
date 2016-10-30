@@ -56,15 +56,21 @@ abstract class Master extends Actor {
           resultHandler = context.actorOf(Props[ResultHandler])
       }
 
-      //TODO
-    //Forwards a Parse message from the ProjectDownloader to the ProjectRouter
-      /*
-    case Parse(repository,path) =>
-      projectRouter ! Parse(repository, path)
+    //Forwards a Checkout message from the ProjectDownloader to the ProjectVersionCheckoutRouter
+    case CheckoutVersion(repository, version, projectPath) =>
+      projectVersionCheckoutRouter ! CheckoutVersion(repository, version, projectPath)
+
+    //Forwards a Parse message to the ProjectVersionParserRouter
+    case DoneCheckoutVersion(repository, version, versionPath) =>
+      projectVersionParserRouter ! ParseVersion(repository, version, versionPath)
+
+    //Forwards a Graph message to the ProjectVersionGrapherRouter
+    case DoneParseVersion(repository, version, versionDbPath) =>
+      projectVersionGrapherRouter ! GraphVersionDb(repository, version, versionDbPath)
+
     //Forwards a DoneAnalyzing message from the ProjectRouter to the ResultHandler
     case DoneAnalyzing(differences) =>
       resultHandler ! differences
-      */
 
   }
 
