@@ -9,7 +9,7 @@ sealed trait EntityVertex {
 }
 case class ClassVertex(name: String, longName: String) extends EntityVertex
 case class InterfaceVertex(name: String, longName: String) extends EntityVertex
-case class MethodVertex(name: String, longName: String) extends EntityVertex
+case class MethodVertex(name: String, longName: String, parameters: List[String], returnType: String) extends EntityVertex
 case class LocalVariableVertex(name: String, longName: String) extends EntityVertex
 case class FieldVertex(name: String, longName: String) extends EntityVertex
 
