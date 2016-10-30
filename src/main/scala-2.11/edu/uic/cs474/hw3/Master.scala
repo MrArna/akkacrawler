@@ -47,17 +47,18 @@ abstract class Master extends Actor {
         case a:ProjectDownloader =>
           projectDownloader = context.actorOf(Props[ProjectDownloader])
         case a:ProjectVersionCheckout =>
-          projectVersionCheckoutRouter = context.actorOf(Props[ProjectVersionCheckout])
+          projectVersionCheckoutRouter = context.actorOf(Props[ProjectVersionCheckoutRouter])
         case a:ProjectVersionParser =>
-          projectVersionParserRouter = context.actorOf(Props[ProjectVersionParser])
+          projectVersionParserRouter = context.actorOf(Props[ProjectVersionParserRouter])
         case a:ProjectVersionGrapher =>
-          projectVersionGrapherRouter = context.actorOf(Props[ProjectVersionGrapher])
+          projectVersionGrapherRouter = context.actorOf(Props[ProjectVersionGrapherRouter])
         case a:ResultHandler =>
           resultHandler = context.actorOf(Props[ResultHandler])
       }
 
-      /*
+      //TODO
     //Forwards a Parse message from the ProjectDownloader to the ProjectRouter
+      /*
     case Parse(repository,path) =>
       projectRouter ! Parse(repository, path)
     //Forwards a DoneAnalyzing message from the ProjectRouter to the ResultHandler
