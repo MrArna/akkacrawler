@@ -1,5 +1,6 @@
 package edu.uic.cs474.hw3.messages
 
+import edu.uic.cs474.hw3.analysis.Differences
 import edu.uic.cs474.hw3.graphing.{EntityVertex, ReferenceEdge}
 import org.jgrapht.DirectedGraph
 
@@ -39,5 +40,5 @@ case class Analyze(repository: String,
                    graphV2:DirectedGraph[EntityVertex, ReferenceEdge]) extends Message
 
 //Tell the ResultHandler that the analysis is complete
-case class DoneAnalyzing(differences:Any) extends Message
+case class DoneAnalyzing(differences:Differences) extends Message
 
