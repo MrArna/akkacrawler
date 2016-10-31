@@ -1,5 +1,6 @@
 package edu.uic.cs474.hw3.graphing
 
+import edu.uic.cs474.hw3.undestand._
 import edu.uic.cs474.hw3.parsing._
 
 /**
@@ -11,48 +12,54 @@ sealed trait ReferenceEdge {
   def destination: EntityVertex
 }
 
-case class CallEdge(source: MethodVertex,
-                    destination: MethodVertex) extends ReferenceEdge {
+case class CallEdge(source: EntityVertex,
+                    destination: EntityVertex) extends ReferenceEdge {
   override def kind: String = Call.kind
 }
 
-case class ClassExtendEdge(source: ClassVertex,
-                           destination: ClassVertex) extends ReferenceEdge {
+case class ClassExtendEdge(source: EntityVertex,
+                           destination: EntityVertex) extends ReferenceEdge {
   override def kind: String = Extend.kind
 }
 
-case class InterfaceExtendEdge(source: InterfaceVertex,
-                               destination: InterfaceVertex) extends ReferenceEdge {
+case class InterfaceExtendEdge(source: EntityVertex,
+                               destination: EntityVertex) extends ReferenceEdge {
   override def kind: String = Extend.kind
 }
 
-case class ImplementEdge(source: ClassVertex,
-                         destination: InterfaceVertex) extends ReferenceEdge {
+case class ImplementEdge(source: EntityVertex,
+                         destination: EntityVertex) extends ReferenceEdge {
   override def kind: String = Implement.kind
 }
 
-case class FieldEdge(source: ClassVertex,
-                     destination: FieldVertex) extends ReferenceEdge {
+case class FieldEdge(source: EntityVertex,
+                     destination: EntityVertex) extends ReferenceEdge {
   override def kind: String = Define.kind
 }
 
-case class UseFieldEdge(source: MethodVertex,
-                        destination: FieldVertex) extends ReferenceEdge {
+case class UseFieldEdge(source: EntityVertex,
+                        destination: EntityVertex) extends ReferenceEdge {
   override def kind: String = Use.kind
 }
 
-case class SetLocalVariableEdge(source: MethodVertex,
-                                destination: LocalVariableVertex) extends ReferenceEdge {
+case class SetLocalVariableEdge(source: EntityVertex,
+                                destination: EntityVertex) extends ReferenceEdge {
   override def kind: String = Set.kind
 }
 
-case class DefineParameterEdge(source: MethodVertex,
-                               destination: ClassVertex) extends ReferenceEdge {
+case class DefineParameterEdge(source: EntityVertex,
+                               destination: EntityVertex) extends ReferenceEdge {
   override def kind: String = Define.kind
 }
 
-case class ReturnTypeEdge(source: MethodVertex,
-                          destination: ClassVertex) extends ReferenceEdge {
+case class DefineMethodEdge(source: EntityVertex,
+                               destination: EntityVertex) extends ReferenceEdge {
+  //TODO: is it define? lookup understand docs
+  override def kind: String = Define.kind
+}
+
+case class ReturnTypeEdge(source: EntityVertex,
+                          destination: EntityVertex) extends ReferenceEdge {
   override def kind: String = "return"
 }
 
