@@ -32,17 +32,22 @@ case class ImplementEdge(source: EntityVertex,
   override def kind: String = Implement.kind
 }
 
-case class FieldEdge(source: EntityVertex,
-                     destination: EntityVertex) extends ReferenceEdge {
+case class DefineFieldVariableEdge(source: EntityVertex,
+                           destination: EntityVertex) extends ReferenceEdge {
   override def kind: String = Define.kind
 }
 
-case class UseFieldEdge(source: EntityVertex,
+case class UseFieldVariableEdge(source: EntityVertex,
                         destination: EntityVertex) extends ReferenceEdge {
   override def kind: String = Use.kind
 }
 
 case class SetLocalVariableEdge(source: EntityVertex,
+                                destination: EntityVertex) extends ReferenceEdge {
+  override def kind: String = Set.kind
+}
+
+case class UseLocalVariableEdge(source: EntityVertex,
                                 destination: EntityVertex) extends ReferenceEdge {
   override def kind: String = Set.kind
 }
@@ -58,9 +63,6 @@ case class DefineMethodEdge(source: EntityVertex,
   override def kind: String = Define.kind
 }
 
-case class ReturnTypeEdge(source: EntityVertex,
-                          destination: EntityVertex) extends ReferenceEdge {
-  override def kind: String = "return"
-}
+
 
 

@@ -8,7 +8,7 @@ sealed trait EntityKind { def kind: String }
 case object NotUnknown extends EntityKind { val kind = "~unknown"}
 case object NotUnresolved extends EntityKind { val kind = "~unresolved"}
 case object Method extends EntityKind { val kind = "method"}
-case object Variable extends EntityKind { val kind = "variable"}
+case object LocalVariable extends EntityKind { val kind = "variable local"}
 case object Constructor extends EntityKind { val kind = "constructor"}
 case object Interface extends EntityKind { val kind = "interface"}
 case object Annotation extends EntityKind { val kind = "annotation"}
@@ -18,7 +18,7 @@ case object Enum extends EntityKind { val kind = "enum"}
 case object ClassOrEnum extends EntityKind { val kind = "class enum"}
 case object NotAnnotation extends EntityKind { val kind = "~annotation"}
 case object NotTypeVariable extends EntityKind { val kind = "~TypeVariable"}
-  
+case object FieldVariable extends EntityKind { val kind = "variable ~local"}
 case class UnknownEntityKind (kind: String) extends EntityKind
 
 

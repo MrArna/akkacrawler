@@ -32,7 +32,7 @@ class Master extends Actor {
       projectDownloader = context.actorOf(Props[ProjectDownloader])
       ProjectVersionManagerRouter = context.actorOf(Props[ProjectVersionManagerRouter])
       projectVersionParserRouter = context.actorOf(Props[ProjectVersionParserRouter])
-      //projectVersionGrapherRouter = context.actorOf(Props[ProjectVersionGrapherRouter])
+      projectVersionGrapherRouter = context.actorOf(Props[ProjectVersionGrapherRouter])
       //resultHandler = context.actorOf(Props[ResultHandler])
 
       projectDownloader ! Start
@@ -50,9 +50,9 @@ class Master extends Actor {
           ProjectVersionManagerRouter = context.actorOf(Props[ProjectVersionManagerRouter])
         case a:ProjectVersionParser =>
           projectVersionParserRouter = context.actorOf(Props[ProjectVersionParserRouter])
-        /*
         case a:ProjectVersionGrapher =>
           projectVersionGrapherRouter = context.actorOf(Props[ProjectVersionGrapherRouter])
+          /*
         case a:ResultHandler =>
           resultHandler = context.actorOf(Props[ResultHandler])
           */
@@ -74,11 +74,11 @@ class Master extends Actor {
     //Forwards a Parse message to the ProjectVersionParserRouter
     case DoneCheckoutVersion(repository, version, versionPath) =>
       projectVersionParserRouter ! ParseVersion(repository, version, versionPath)
-/*
+
     //Forwards a Graph message to the ProjectVersionGrapherRouter
     case DoneParseVersion(repository, version, versionDbPath) =>
       projectVersionGrapherRouter ! GraphVersionDb(repository, version, versionDbPath)
-
+/*
     //Forwards a DoneAnalyzing message from the ProjectRouter to the ResultHandler
     case DoneAnalyzing(differences) =>
       resultHandler ! differences

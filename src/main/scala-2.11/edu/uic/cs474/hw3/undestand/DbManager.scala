@@ -13,7 +13,7 @@ class DbManager(val db: Database) {
     return db.ents("%s %s %s %s %s".format(entityKindList.mkString(" "),
       NotUnknown.kind,
       NotUnresolved.kind,
-      NotTypevariable.kind,
+      NotTypeVariable.kind,
       NotAnnotation.kind)).toList
   }
 }

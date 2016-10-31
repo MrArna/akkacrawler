@@ -23,12 +23,12 @@ class ProjectVersionGrapherRouter extends Actor {
 
   //Handle received messages
   def receive = {
-    //Forward CheckoutVersion to a free ProjectVersionGrapher
-    case version:CheckoutVersion =>
+    //Forward GraphVersionDb to a free ProjectVersionGrapher
+    case version:GraphVersionDb =>
       router.route(version, sender)
 
-    //Forward DoneCheckoutVersion to the Master
-    case done:DoneCheckoutVersion =>
+    //Forward DoneGraphVersionDb to the Master
+    case done:DoneGraphVersionDb =>
       context.parent ! done
 
     //Handle unexpected termination of a ProjectVersionGrapher by restarting another one
