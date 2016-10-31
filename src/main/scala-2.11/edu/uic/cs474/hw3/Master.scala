@@ -5,21 +5,21 @@ import edu.uic.cs474.hw3.analysis.ResultHandler
 import edu.uic.cs474.hw3.graphing.{ProjectVersionGrapher, ProjectVersionGrapherRouter}
 import edu.uic.cs474.hw3.http.ProjectDownloader
 import edu.uic.cs474.hw3.parsing.{ProjectVersionParser, ProjectVersionParserRouter}
-import edu.uic.cs474.hw3.versioning.{ProjectVersionCheckout, ProjectVersionCheckoutRouter}
+import edu.uic.cs474.hw3.versioning.{ProjectVersionManager, ProjectVersionManagerRouter}
 import messages._
 
 /**
   * The Master is the top level actor in the application. It starts three children: a ProjectDownloader,
-  * a ProjectVersionCheckoutRouter, ProjectVersionParserRouter, ProjectVersionGrapherRouter and a ResultHandler.
+  * a ProjectVersionManagerRouter, ProjectVersionParserRouter, ProjectVersionGrapherRouter and a ResultHandler.
   * When the Master is started (through the Start message), it forwards the message
   * to the ProjectDownloader to initiate the download procedure. During the execution, the Master forwards messages
   * between its children. Furthermore, the Master monitors the state of its children and, in case of failure, restarts them.
   */
-abstract class Master extends Actor {
+class Master extends Actor {
 
   //Actor references to the children
   private var projectDownloader:ActorRef = _
-  private var projectVersionCheckoutRouter:ActorRef = _
+  private var ProjectVersionManagerRouter:ActorRef = _
   private var projectVersionParserRouter:ActorRef = _
   private var projectVersionGrapherRouter:ActorRef = _
   private var resultHandler:ActorRef = _
@@ -30,7 +30,7 @@ abstract class Master extends Actor {
     //Start the Master
     case Start =>
       projectDownloader = context.actorOf(Props[ProjectDownloader])
-      projectVersionCheckoutRouter = context.actorOf(Props[ProjectVersionCheckoutRouter])
+      ProjectVersionManagerRouter = context.actorOf(Props[ProjectVersionManagerRouter])
       projectVersionParserRouter = context.actorOf(Props[ProjectVersionParserRouter])
       projectVersionGrapherRouter = context.actorOf(Props[ProjectVersionGrapherRouter])
       resultHandler = context.actorOf(Props[ResultHandler])
@@ -46,8 +46,8 @@ abstract class Master extends Actor {
       actor match {
         case a:ProjectDownloader =>
           projectDownloader = context.actorOf(Props[ProjectDownloader])
-        case a:ProjectVersionCheckout =>
-          projectVersionCheckoutRouter = context.actorOf(Props[ProjectVersionCheckoutRouter])
+        case a:ProjectVersionManager =>
+          ProjectVersionManagerRouter = context.actorOf(Props[ProjectVersionManagerRouter])
         case a:ProjectVersionParser =>
           projectVersionParserRouter = context.actorOf(Props[ProjectVersionParserRouter])
         case a:ProjectVersionGrapher =>
@@ -56,9 +56,9 @@ abstract class Master extends Actor {
           resultHandler = context.actorOf(Props[ResultHandler])
       }
 
-    //Forwards a Checkout message from the ProjectDownloader to the ProjectVersionCheckoutRouter
+    //Forwards a Checkout message from the ProjectDownloader to the ProjectVersionManagerRouter
     case CheckoutVersion(repository, version, projectPath) =>
-      projectVersionCheckoutRouter ! CheckoutVersion(repository, version, projectPath)
+      ProjectVersionManagerRouter ! CheckoutVersion(repository, version, projectPath)
 
     //Forwards a Parse message to the ProjectVersionParserRouter
     case DoneCheckoutVersion(repository, version, versionPath) =>

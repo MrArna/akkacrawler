@@ -6,14 +6,14 @@ import edu.uic.cs474.hw3.Config
 import edu.uic.cs474.hw3.messages._
 
 /**
-  * This actor creates a pool of ProjectVersionCheckout (whose size is specified in the global config) and routes versions
+  * This actor creates a pool of ProjectVersionManager (whose size is specified in the global config) and routes versions
   * to checkout to each actor in the pool. The routing policy is round robin.
   */
-class ProjectVersionCheckoutRouter extends Actor {
+class ProjectVersionManagerRouter extends Actor {
 
-  //Create the ProjectVersionCheckout in the pool
-  private val routees = for(i <- 1 to Config.maxProjectVersionCheckouts) yield {
-    val handler = context.actorOf(Props[ProjectVersionCheckout])
+  //Create the ProjectVersionManager in the pool
+  private val routees = for(i <- 1 to Config.maxProjectVersionManagers) yield {
+    val handler = context.actorOf(Props[ProjectVersionManager])
     context watch handler
     ActorRefRoutee(handler)
   }
@@ -23,7 +23,7 @@ class ProjectVersionCheckoutRouter extends Actor {
 
   //Handle received messages
   def receive = {
-    //Forward CheckoutVersion to a free ProjectVersionCheckout
+    //Forward CheckoutVersion to a free ProjectVersionManager
     case version:CheckoutVersion =>
       router.route(version, sender)
 
@@ -31,10 +31,10 @@ class ProjectVersionCheckoutRouter extends Actor {
     case done:DoneCheckoutVersion =>
       context.parent ! done
 
-    //Handle unexpected termination of a ProjectVersionCheckout by restarting another one
+    //Handle unexpected termination of a ProjectVersionManager by restarting another one
     case Terminated(handler) =>
       router = router.removeRoutee(handler)
-      val newHandler = context.actorOf(Props[ProjectVersionCheckout])
+      val newHandler = context.actorOf(Props[ProjectVersionManager])
       context watch newHandler
       router = router.addRoutee(newHandler)
   }

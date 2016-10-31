@@ -5,8 +5,8 @@ package edu.uic.cs474.hw3
   */
 object Config {
 
-  //Maximum number of project version checkout to instantiated
-  private var _maxProjectVersionCheckouts:Int = _
+  //Maximum number of project version managers to instantiated
+  private var _maxProjectVersionManagers:Int = _
   //Maximum number of project parsers to be instantiated by a single project handler
   private var _maxProjectVersionParsers:Int = _
   //Maximum number of project parsers to be instantiated by a single project handler
@@ -19,7 +19,7 @@ object Config {
   private var _mainFolder:String = _
 
   //Getters
-  def maxProjectVersionCheckouts = _maxProjectVersionCheckouts
+  def maxProjectVersionManagers = _maxProjectVersionManagers
   def maxProjectVersionParsers = _maxProjectVersionParsers
   def maxProjectVersionGraphers = _maxProjectVersionGraphers
   def numProjects = _numProjects
@@ -27,7 +27,7 @@ object Config {
   def mainFolder:String = _mainFolder
 
   //Setters
-  def maxProjectVersionCheckouts_=(n:Int):Unit = _maxProjectVersionCheckouts=n
+  def maxProjectVersionManagers_=(n:Int):Unit = _maxProjectVersionManagers=n
   def maxProjectVersionParsers_=(n:Int):Unit = _maxProjectVersionParsers=n
   def maxProjectVersionGraphers_=(n:Int):Unit = _maxProjectVersionGraphers=n
   def numProjects_=(n:Int):Unit = _numProjects=n

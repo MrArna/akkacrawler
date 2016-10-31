@@ -11,6 +11,9 @@ case object Start extends Message
 //Stop the receiving actor
 case object Stop extends Message
 
+case class GetLastMaxNVersions(repository:String, projectPath:String, n:Int) extends Message
+case class DoneGetLastMaxNVersions(repository:String, projectPath:String, nVersionList:List[String]) extends Message
+
 //Tell a ProjectVersionCheckout to checkout a version
 case class CheckoutVersion(repository:String, version:String, projectPath:String) extends Message
 //Tell a ProjectCheckoutVersionRouter that the checkout of one version is complete

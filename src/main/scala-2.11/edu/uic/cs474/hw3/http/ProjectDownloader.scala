@@ -21,8 +21,7 @@ import sys.process._
   */
 
 
-class ProjectDownloader extends Actor with ActorLogging
-{
+class ProjectDownloader extends Actor with ActorLogging {
 
   final implicit val materializer: ActorMaterializer = ActorMaterializer(ActorMaterializerSettings(context.system))
 
@@ -81,17 +80,9 @@ class ProjectDownloader extends Actor with ActorLogging
 
   }
 
-
-
-
   def receive = {
-
-
     case Start =>
       download(2,"tetris","Java")
-
-
-
   }
 
 }
