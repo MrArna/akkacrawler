@@ -1,10 +1,15 @@
 package edu.uic.cs474.hw3.parsing
 
+import java.io.File
+import java.util
+
 import akka.actor.Actor
 import akka.actor.Actor.Receive
 import edu.uic.cs474.hw3.messages.{DoneParseVersion, ParseVersion}
-import org.apache.commons.io.FilenameUtils
+import org.apache.commons.io.filefilter.{DirectoryFileFilter, FalseFileFilter, NameFileFilter, WildcardFileFilter}
+import org.apache.commons.io.{FileUtils, FilenameUtils}
 
+import scala.collection.JavaConverters._
 import sys.process._
 
 /**
@@ -12,20 +17,30 @@ import sys.process._
   */
 class ProjectVersionParser extends Actor {
   override def receive: Receive = {
-    case ParseVersion(repository, version, versionPath) => {
-      val (outputDbPath: String, command: String) = getUnderstandCommand(versionPath)
-      val exitCode: Int = command.!
+    case ParseVersion(repository, version, versionDirPath) => {
+      val (outputDbPath: String, command: (String => String)) = getUnderstandCommand(versionDirPath)
+      println(getSrcDirList(versionDirPath))
+      getSrcDirList(versionDirPath).map(f => command(f.getAbsolutePath)!)
       //TODO: exception on bad exit code and check file exists
       sender ! DoneParseVersion(repository, version, outputDbPath)
     }
   }
 
-  //versionDirPath must end without / TODO fix
-  def getUnderstandCommand(versionDirPath: String): (String, String) = {
+  //TODO fix: versionDirPath must end without /
+  def getUnderstandCommand(versionDirPath: String): (String, String => String) = {
     val versionDirName = FilenameUtils.getBaseName(versionDirPath)
-    val outputDbPath = FilenameUtils.concat(FilenameUtils.getPath(versionDirPath), versionDirName.concat("udb"))
-    val command: String = "und create -db %s -languages java add %s analyze -all"
-      .format(outputDbPath, versionDirPath)
+    val outputDbPath = FilenameUtils.concat(FilenameUtils.getFullPathNoEndSeparator(versionDirPath), versionDirName.concat(".udb"))
+    def command = (srcDirPath: String) => "und create -db %s -languages java add %s analyze -all"
+      .format(outputDbPath, srcDirPath)
     return (outputDbPath, command)
+  }
+
+  /*
+   * Get subdirs named "src"
+   */
+  def getSrcDirList(versionDirPath: String): List[File] = {
+    return FileUtils.listFilesAndDirs(new File(versionDirPath),
+      FalseFileFilter.INSTANCE,
+      DirectoryFileFilter.INSTANCE).asScala.filter(f => f.getName.==("src")).toList
   }
 }

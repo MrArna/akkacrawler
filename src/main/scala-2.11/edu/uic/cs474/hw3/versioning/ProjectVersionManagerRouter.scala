@@ -23,6 +23,18 @@ class ProjectVersionManagerRouter extends Actor {
 
   //Handle received messages
   def receive = {
+    //Forward GetLastMaxNVersions to a free ProjectVersionManager
+    case nVersions:GetLastMaxNVersions => {
+      println("VersionManagerRouter received get last max n versions")
+      router.route(nVersions, sender)
+    }
+
+    //Forward DoneGetLastMaxNVersions to the Master
+    case done:DoneGetLastMaxNVersions => {
+      println("VersionManagerRouter received done get last max n versions")
+      context.parent ! done
+    }
+
     //Forward CheckoutVersion to a free ProjectVersionManager
     case version:CheckoutVersion =>
       router.route(version, sender)

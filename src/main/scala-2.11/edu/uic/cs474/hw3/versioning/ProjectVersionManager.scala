@@ -18,6 +18,9 @@ import scala.collection.JavaConverters._
   * Created by Alessandro on 30/10/16.
   */
 class ProjectVersionManager extends Actor {
+  val ShortHashLength = 7
+  val Separator = "_"
+
   override def receive: Receive = {
     case GetLastMaxNVersions(repository, projectDirPath, n) => {
       val commitList: Iterable[RevCommit] = Git.open(new File(projectDirPath)).log()
@@ -36,7 +39,8 @@ class ProjectVersionManager extends Actor {
 
   //projectDirPath must not end with / TODO add check and fix of /
   def createVersionDir(projectDirPath: String, version: String): String = {
-  val versionDirPath: String = FilenameUtils.concat(FilenameUtils.getPath(projectDirPath), version)
+  val versionDirPath: String = FilenameUtils.concat(FilenameUtils.getFullPathNoEndSeparator(projectDirPath),
+    FilenameUtils.getBaseName(projectDirPath).concat(Separator).concat(version.substring(0,ShortHashLength)))
     FileUtils.copyDirectory(new File(projectDirPath), new File(versionDirPath))
     return versionDirPath
   }

@@ -7,7 +7,7 @@ import akka.http.scaladsl.model.{HttpMethods, HttpRequest, HttpResponse}
 import akka.stream.scaladsl.{Flow, Keep, RunnableGraph, Sink, Source}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import akka.util.ByteString
-import edu.uic.cs474.hw3.messages.{CheckoutVersion, Start}
+import edu.uic.cs474.hw3.messages.{CheckoutVersion, GetLastMaxNVersions, Start}
 import org.json4s.JsonAST.JArray
 
 import scala.concurrent.duration.Duration
@@ -74,7 +74,6 @@ class ProjectDownloader extends Actor with ActorLogging {
     {
       "git clone " + url  + " " + keyword + index !!;
       //TODO
-      //sender ! CheckoutVersion(keyword + index, keyword + index)
       index = index + 1
     }
 
@@ -82,7 +81,10 @@ class ProjectDownloader extends Actor with ActorLogging {
 
   def receive = {
     case Start =>
-      download(2,"tetris","Java")
+      //download(2,"tetris","Java")
+      sender ! GetLastMaxNVersions("tetris1", "/Users/Alessandro/Dropbox/Universita/UIC/OOP/marco_arnaboldi_alessandro_pappalardo_andrea_tirinzoni_hw3/tetris1", 2)
+      sender ! GetLastMaxNVersions("tetris2", "/Users/Alessandro/Dropbox/Universita/UIC/OOP/marco_arnaboldi_alessandro_pappalardo_andrea_tirinzoni_hw3/tetris2", 2)
+      println("Sent two get last max 2 versions")
   }
 
 }
