@@ -9,8 +9,8 @@ import com.scitools.understand.{Database, Entity}
   */
 class DbManager(val db: Database) {
 
-  def getEntityListByTypeListFromDb(entityKindList: List[EntityKind]): List[Entity] = {
-    return db.ents("%s %s %s %s %s".format(entityKindList.mkString(" "),
+  def getEntityListByTypeListFromDb(entityKind: EntityKind): List[Entity] = {
+    return db.ents("%s %s %s %s %s".format(entityKind.kind,
       NotUnknown.kind,
       NotUnresolved.kind,
       NotTypeVariable.kind,

@@ -11,5 +11,9 @@ case class ClassVertex(name: String, longName: String) extends EntityVertex
 case class InterfaceVertex(name: String, longName: String) extends EntityVertex
 case class MethodVertex(name: String, longName: String, returnType: String, parameters: List[String]) extends EntityVertex
 case class VariableVertex(name: String, longName: String) extends EntityVertex
+case class EnumConstantVertex(name: String, longName: String) extends EntityVertex
+case class EnumVertex(name: String, longName: String) extends EntityVertex
+
+
 
 

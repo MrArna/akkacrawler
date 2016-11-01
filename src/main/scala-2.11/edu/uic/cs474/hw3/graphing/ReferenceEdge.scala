@@ -52,14 +52,8 @@ case class UseLocalVariableEdge(source: EntityVertex,
   override def kind: String = Set.kind
 }
 
-case class DefineParameterEdge(source: EntityVertex,
-                               destination: EntityVertex) extends ReferenceEdge {
-  override def kind: String = Define.kind
-}
-
 case class DefineMethodEdge(source: EntityVertex,
                                destination: EntityVertex) extends ReferenceEdge {
-  //TODO: is it define? lookup understand docs
   override def kind: String = Define.kind
 }
 
