@@ -17,13 +17,13 @@ import sys.process._
   */
 class ProjectVersionParser extends Actor {
   override def receive: Receive = {
-    case ParseVersion(repository, version, versionDirPath) => {
+    case ParseVersion(repository, numberOfVersions, version, versionDirPath) => {
       val (outputDbPath: String, command: (String => String)) = getUnderstandCommand(versionDirPath)
       println(getSrcDirList(versionDirPath))
       //call the command closed on the outputDbPath with each of the "src" folders for that version
-      getSrcDirList(versionDirPath).map(f => command(f.getAbsolutePath)!)
+      getSrcDirList(versionDirPath).foreach(f => command(f.getAbsolutePath)!)
       //TODO: exception on bad exit code and check file exists
-      sender ! DoneParseVersion(repository, version, outputDbPath)
+      sender ! DoneParseVersion(repository, numberOfVersions, version, outputDbPath)
     }
   }
 

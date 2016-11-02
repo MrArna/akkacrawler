@@ -2,7 +2,7 @@ package edu.uic.cs474.hw3.analysis
 
 import akka.actor.Actor
 import akka.actor.Actor.Receive
-import edu.uic.cs474.hw3.messages.DoneAnalyzing
+import edu.uic.cs474.hw3.messages.{DoneAnalyzing, Stop}
 
 /**
   * Created by andrea on 23/10/16.
@@ -26,5 +26,7 @@ class ResultHandler extends Actor {
         println(diff)
       })
       println("#############################################################################################\n")
+
+      sender ! Stop
   }
 }

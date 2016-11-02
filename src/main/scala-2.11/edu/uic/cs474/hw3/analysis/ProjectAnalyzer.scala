@@ -5,18 +5,43 @@ import edu.uic.cs474.hw3.graphing._
 import edu.uic.cs474.hw3.messages.{Analyze, DoneAnalyzing}
 import edu.uic.cs474.hw3.undestand.ReferenceKind
 import org.jgrapht.DirectedGraph
+import org.jgrapht.graph.SimpleDirectedGraph
 
 import scala.collection.immutable.HashSet
 import collection.JavaConverters._
+import scala.collection.mutable.ListBuffer
 
 /**
   * Created by andrea on 23/10/16.
   */
 class ProjectAnalyzer extends Actor {
 
+  val graphListBuffer = ListBuffer.empty[(String, List[String], String, DirectedGraph[EntityVertex,ReferenceEdge])]
+
+  def NVersionsFirstLastAnalysis(nVersionList: List[String]): Unit = {
+    graphListBuffer.toList
+      .filter(tuple => tuple._3 == nVersionList(0) || tuple._3 == nVersionList.last)
+      .take(2)
+      .sliding(2)
+      .map(listOfTwo => analyze(listOfTwo(0)._1, listOfTwo(0)._3, listOfTwo(1)._3, listOfTwo(0)._4, listOfTwo(1)._4))
+      .foreach(differences => sender ! DoneAnalyzing(differences))
+  }
+
+  def NVersionsTwoByTwoAnalysis(nVersionList: List[String]): Unit = {
+    graphListBuffer.toList
+      .sortWith((firstTuple, secondTuple) => nVersionList.indexOf(firstTuple._3) < nVersionList.indexOf(secondTuple._3))
+      .sliding(2)
+      .map(listOfTwo => analyze(listOfTwo(0)._1, listOfTwo(0)._3, listOfTwo(1)._3, listOfTwo(0)._4, listOfTwo(1)._4))
+      .foreach(differences => sender ! DoneAnalyzing(differences))
+  }
+
   def receive = {
-    case Analyze(repository,version1,version2,graph1,graph2) =>
-      sender ! DoneAnalyzing(analyze(repository,version1,version2,graph1,graph2))
+    case Analyze(repository, nVersionList, version, graph) =>
+      graphListBuffer += ((repository, nVersionList, version, graph))
+      println("Graph buffer size is " + graphListBuffer.size)
+      if (graphListBuffer.size == nVersionList.size) {
+        NVersionsFirstLastAnalysis(nVersionList)
+      }
   }
 
   private def analyze(repository:String,version1:String,version2:String,graph1:DirectedGraph[EntityVertex, ReferenceEdge],graph2:DirectedGraph[EntityVertex, ReferenceEdge]) : Differences = {
@@ -41,7 +66,7 @@ class ProjectAnalyzer extends Actor {
           if(source.isInstanceOf[MethodVertex])
             diffs.add(source.longName,"New invocation of "+destination.longName)
         //New class field usage
-        case UseFieldEdge(source,destination) =>
+        case UseFieldVariableEdge(source,destination) =>
           if(source.isInstanceOf[MethodVertex])
             diffs.add(source.longName,"New usage of class field "+destination.longName)
         //New field usage
@@ -60,7 +85,7 @@ class ProjectAnalyzer extends Actor {
           if(source.isInstanceOf[MethodVertex])
             diffs.add(source.longName,"Removed invocation of "+destination.longName)
         //Removed class field usage
-        case UseFieldEdge(source,destination) =>
+        case UseFieldVariableEdge(source,destination) =>
           if(source.isInstanceOf[MethodVertex])
             diffs.add(source.longName,"Removed usage of class field "+destination.longName)
         //Removed field usage

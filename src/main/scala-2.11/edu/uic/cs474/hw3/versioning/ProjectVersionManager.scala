@@ -26,14 +26,16 @@ class ProjectVersionManager extends Actor {
       val commitList: Iterable[RevCommit] = Git.open(new File(projectDirPath)).log()
         .setMaxCount(n)
         .call()
-      val commitHashList: List[String] = commitList.asScala.map(_.getName).toList;
-      sender ! DoneGetLastMaxNVersions(repository, projectDirPath, commitHashList)
+      //first element of the list is the most recent
+      val hashCommitList: List[String] = commitList.asScala.map(_.getName).toList;
+      println(hashCommitList)
+      sender ! DoneGetLastMaxNVersions(repository, projectDirPath, hashCommitList)
     }
 
-    case CheckoutVersion(repository, version, projectPath) => {
+    case CheckoutVersion(repository, numberOfVersions, version, projectPath) => {
       val versionDirPath = createVersionDir(projectPath, version)
       checkoutVersion(versionDirPath, version)
-      sender ! DoneCheckoutVersion(repository, version, versionDirPath)
+      sender ! DoneCheckoutVersion(repository, numberOfVersions, version, versionDirPath)
     }
   }
 

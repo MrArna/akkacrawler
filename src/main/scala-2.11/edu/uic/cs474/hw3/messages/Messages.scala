@@ -16,28 +16,28 @@ case class GetLastMaxNVersions(repository:String, projectPath:String, n:Int) ext
 case class DoneGetLastMaxNVersions(repository:String, projectPath:String, nVersionList:List[String]) extends Message
 
 //Tell a ProjectVersionCheckout to checkout a version
-case class CheckoutVersion(repository:String, version:String, projectPath:String) extends Message
+case class CheckoutVersion(repository:String, nVersionList:List[String], version:String, projectPath:String) extends Message
 //Tell a ProjectCheckoutVersionRouter that the checkout of one version is complete
-case class DoneCheckoutVersion(repository:String, version:String, versionPath: String) extends Message
+case class DoneCheckoutVersion(repository:String, nVersionList:List[String], version:String, versionPath: String) extends Message
 
 //Tell a ProjectVersionParser to parse a version
-case class ParseVersion(repository:String, version:String, versionPath:String) extends Message
+case class ParseVersion(repository:String, nVersionList:List[String], version:String, versionPath:String) extends Message
 //Tell a ProjectVersionCheckoutRouter that the checkout of one version is complete
-case class DoneParseVersion(repository:String, version:String, versionDbPath: String) extends Message
+case class DoneParseVersion(repository:String, nVersionList:List[String], version:String, versionDbPath: String) extends Message
 
 //Tell a ProjectVersionGrapher to graph a version db
-case class GraphVersionDb(repository:String, version:String, versionDbPath:String) extends Message
+case class GraphVersionDb(repository:String, nVersionList:List[String], version:String, versionDbPath:String) extends Message
 //Tell a ProjectVersionGrapherRouter that the graph of a version db is done
 case class DoneGraphVersionDb(repository:String,
+                              nVersionList:List[String],
                               version:String,
                               versionDbGraph: DirectedGraph[EntityVertex, ReferenceEdge]) extends Message
 
 //Tell a ProjectAnalyzer to analyze the project's graphs
 case class Analyze(repository: String,
-                   version1: String,
-                   version2: String,
-                   graphV1: DirectedGraph[EntityVertex, ReferenceEdge],
-                   graphV2:DirectedGraph[EntityVertex, ReferenceEdge]) extends Message
+                   nVersionList:List[String],
+                   version: String,
+                   graph:DirectedGraph[EntityVertex, ReferenceEdge]) extends Message
 
 //Tell the ResultHandler that the analysis is complete
 case class DoneAnalyzing(differences:Differences) extends Message

@@ -69,7 +69,7 @@ class ReferenceGraphBuilder(dbManager: DbManager) {
     }
 
     def addReferenceHelper(entity: Entity, referenceKind: ReferenceKind, toEntityKind: EntityKind) = {
-      getReferenceEntityList(entity, referenceKind, toEntityKind).map(_.ent()).map(referencedEntity => {
+      getReferenceEntityList(entity, referenceKind, toEntityKind).map(_.ent()).foreach(referencedEntity => {
         val fromVertex = getEntityVertex(entity)
         val referencedVertex = getEntityVertex(referencedEntity)
         referenceGraph.addVertex(referencedVertex)
@@ -105,16 +105,16 @@ class ReferenceGraphBuilder(dbManager: DbManager) {
       entityKindList
         .map(entityKind => dbManager.getEntityListByTypeListFromDb(entityKind))
         .map(entityList => entityList.filterNot(e => e.longname(true).startsWith(Java.prefix) || e.longname(true).startsWith(Sun.prefix))
-          .map(entity => addEntityToGraph(entity)))
+          .foreach(entity => addEntityToGraph(entity)))
       entityKindList
         .filterNot((entityKind => entityKind == LocalVariable || entityKind == FieldVariable))
         .map(entityKind => dbManager.getEntityListByTypeListFromDb(entityKind))
         .map(entityList => entityList.filterNot(e => e.longname(true).startsWith(Java.prefix) || e.longname(true).startsWith(Sun.prefix))
-          .map(entity => addReferencesToGraph(entity)))
+          .foreach(entity => addReferencesToGraph(entity)))
     }
 
     buildGraph(List(FieldVariable, LocalVariable, Method, Class, Interface))
 
-    referenceGraph.edgeSet().asScala.map(edge => println(edge.source.name + " " + edge.kind + " " + edge.destination.name))
+    referenceGraph.edgeSet().asScala.foreach(edge => println(edge.source.name + " " + edge.kind + " " + edge.destination.name))
   }
 }

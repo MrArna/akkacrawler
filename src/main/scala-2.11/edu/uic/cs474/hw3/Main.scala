@@ -12,8 +12,9 @@ import edu.uic.cs474.hw3.undestand.DbManager
 object Main extends App {
   val system = ActorSystem("GithubAnalyzer")
   val master = system.actorOf(Props[Master])
-  Config.maxProjectVersionManagers_=(2)
-  Config.maxProjectVersionParsers_=(2)
+  Config.maxProjectVersionManagers_=(3)
+  Config.maxProjectVersionParsers_=(1)
+  Config.maxNVersions_=(3)
   Config.maxProjectVersionGraphers_=(1)
   master ! Start
 
