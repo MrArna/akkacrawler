@@ -70,10 +70,10 @@ class ProjectAnalyzer extends Actor {
           if(source.isInstanceOf[MethodVertex])
             diffs.add(source.longName,"New usage of class field "+destination.longName)
         //New field usage
-        case UseLocalFieldEdge(source,destination) =>
+        case UseLocalVariableEdge(source,destination) =>
           if(source.isInstanceOf[MethodVertex])
             diffs.add(source.longName,"New usage of local field "+destination.longName)
-
+        case _ =>
       }
     })
 
@@ -89,10 +89,10 @@ class ProjectAnalyzer extends Actor {
           if(source.isInstanceOf[MethodVertex])
             diffs.add(source.longName,"Removed usage of class field "+destination.longName)
         //Removed field usage
-        case UseLocalFieldEdge(source,destination) =>
+        case UseLocalVariableEdge(source,destination) =>
           if(source.isInstanceOf[MethodVertex])
             diffs.add(source.longName,"Removed usage of local field "+destination.longName)
-
+        case _ =>
       }
     })
 

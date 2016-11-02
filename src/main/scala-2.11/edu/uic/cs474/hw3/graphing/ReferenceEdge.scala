@@ -42,11 +42,6 @@ case class UseFieldVariableEdge(source: EntityVertex,
   override def kind: String = Use.kind
 }
 
-case class UseLocalFieldEdge(source: EntityVertex,
-                        destination: EntityVertex) extends ReferenceEdge {
-  override def kind: String = Use.kind
-}
-
 case class SetLocalVariableEdge(source: EntityVertex,
                                 destination: EntityVertex) extends ReferenceEdge {
   override def kind: String = Set.kind

@@ -83,7 +83,7 @@ class ProjectDownloader extends Actor with ActorLogging {
   def receive = {
     case Start =>
       //download(2,"tetris","Java")
-      sender ! GetLastMaxNVersions("picasso", "/Users/Alessandro/Dropbox/Universita/UIC/OOP/marco_arnaboldi_alessandro_pappalardo_andrea_tirinzoni_hw3/picasso", Config.maxNVersions)
+      sender ! GetLastMaxNVersions("tetris1", "/Users/Alessandro/Dropbox/Universita/UIC/OOP/marco_arnaboldi_alessandro_pappalardo_andrea_tirinzoni_hw3/tetris1", Config.maxNVersions)
       //sender ! GetLastMaxNVersions("tetris2", "/Users/Alessandro/Dropbox/Universita/UIC/OOP/marco_arnaboldi_alessandro_pappalardo_andrea_tirinzoni_hw3/tetris2", 2)
       println("Sent two get last max 2 versions")
   }
