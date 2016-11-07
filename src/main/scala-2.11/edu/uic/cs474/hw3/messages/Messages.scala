@@ -3,11 +3,12 @@ package edu.uic.cs474.hw3.messages
 //A trait representing messages
 sealed trait Message
 
-//Start the receiving actor
-case object Start extends Message
+
 //Stop the receiving actor
 case object Stop extends Message
 
+//Start the receiving actor
+case class Start(nrProjects:Int, keyword: String, lang: String) extends Message
 //Tell a ProjectHandler to start parsing a project
 case class Parse(repository:String,path:String) extends Message
 //Tell a ProjectHandler that the parsing of one directory is complete
