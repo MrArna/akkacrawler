@@ -12,6 +12,8 @@ case object Start extends Message
 //Stop the receiving actor
 case object Stop extends Message
 
+//Start the receiving actor
+case class Start(nrProjects:Int, keyword: String, lang: String) extends Message
 case class GetLastMaxNVersions(repository:String, projectPath:String, n:Int) extends Message
 case class DoneGetLastMaxNVersions(repository:String, projectPath:String, nVersionList:List[String]) extends Message
 

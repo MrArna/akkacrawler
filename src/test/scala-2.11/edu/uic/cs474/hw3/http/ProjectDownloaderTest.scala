@@ -28,7 +28,7 @@ class ProjectDownloaderTest extends FunSuite
 
     val actorRef = TestActorRef(new ProjectDownloader)
 
-    actorRef ! Start
+    actorRef ! Start(2,"tetris","Java")
 
   }
 

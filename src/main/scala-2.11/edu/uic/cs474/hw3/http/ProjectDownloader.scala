@@ -7,15 +7,12 @@ import akka.http.scaladsl.model.{HttpMethods, HttpRequest, HttpResponse}
 import akka.stream.scaladsl.{Flow, Keep, RunnableGraph, Sink, Source}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import akka.util.ByteString
-import edu.uic.cs474.hw3.Config
-import edu.uic.cs474.hw3.messages.{CheckoutVersion, GetLastMaxNVersions, Start}
-import org.json4s.JsonAST.JArray
+import edu.uic.cs474.hw3.messages.{Parse, Start}
+import org.json4s.jackson._
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
-import org.json4s.jackson._
-
-import sys.process._
+import scala.sys.process._
 
 /**
   * Created by andrea on 23/10/16.
@@ -38,7 +35,7 @@ class ProjectDownloader extends Actor with ActorLogging {
     val request:HttpRequest=
       HttpRequest(
         GET,
-        uri = "https://api.github.com/search/repositories?q=" + keyword + "+language:" + lang + "&per_page=" + numberOfProject
+        uri = "rrepositories?q=" + keyword + "+language:" + lang + "&per_page=" + numberOfProject
       )
 
     val fut : Future[HttpResponse] = http.singleRequest(request)
@@ -58,14 +55,6 @@ class ProjectDownloader extends Actor with ActorLogging {
     val json = parseJson(aggregation.value.get.get)
 
 
-    //val xml = XML.loadString(aggregation.value.get.get)
-    //var list : List[JValue] = List()
-
-    //for(account <- xml \\ "account") list = list :+ toJson(account).removeField { _ == JField("badges",JNothing)}
-
-
-    //println(prettyJson(json \\ "clone_url"))
-
     val urls = json \\ "clone_url"
 
 
@@ -74,18 +63,25 @@ class ProjectDownloader extends Actor with ActorLogging {
     for (url <- (urls \ "clone_url").values.asInstanceOf[List[String]])
     {
       "git clone " + url  + " " + keyword + index !!;
-      //TODO
+      sender ! GetLastMaxNVersions("tetris1", "/Users/Alessandro/Dropbox/Universita/UIC/OOP/marco_arnaboldi_alessandro_pappalardo_andrea_tirinzoni_hw3/tetris1", Config.maxNVersions)
+
+      sender ! Parse(keyword + index, keyword + index)
       index = index + 1
     }
 
   }
 
+
+
+
   def receive = {
-    case Start =>
-      //download(2,"tetris","Java")
-      sender ! GetLastMaxNVersions("tetris1", "/Users/Alessandro/Dropbox/Universita/UIC/OOP/marco_arnaboldi_alessandro_pappalardo_andrea_tirinzoni_hw3/tetris1", Config.maxNVersions)
-      //sender ! GetLastMaxNVersions("tetris2", "/Users/Alessandro/Dropbox/Universita/UIC/OOP/marco_arnaboldi_alessandro_pappalardo_andrea_tirinzoni_hw3/tetris2", 2)
-      println("Sent two get last max 2 versions")
+
+
+    case Start(nrProjects,keyword,lang) =>
+      download(nrProjects,keyword,lang)
+
+
+
   }
 
 }
