@@ -1,5 +1,8 @@
 package edu.uic.cs474.hw3
 
+import edu.uic.cs474.hw3.analysis.AnalysisPolicy
+import edu.uic.cs474.hw3.versioning.VersionPolicy
+
 /**
   * The global configuration.
   */
@@ -19,6 +22,10 @@ object Config {
   private var _language:String = _
   //The main folder where downloaded and temporary files should be created
   private var _mainFolder:String = _
+  //Analysis policy
+  private var _analysisPolicy: AnalysisPolicy = _
+  //Version policy
+  private var _versionPolicy: VersionPolicy = _
 
   //Getters
   def maxProjectVersionManagers = _maxProjectVersionManagers
@@ -28,6 +35,8 @@ object Config {
   def maxNVersions:Int = _maxNVersions
   def language:String = _language
   def mainFolder:String = _mainFolder
+  def analysisPolicy:AnalysisPolicy = _analysisPolicy
+  def versionPolicy:VersionPolicy = _versionPolicy
 
   //Setters
   def maxProjectVersionManagers_=(n:Int):Unit = _maxProjectVersionManagers=n
@@ -37,4 +46,6 @@ object Config {
   def maxNVersions_=(n:Int):Unit = _maxNVersions=n
   def language_=(s:String):Unit = _language=s
   def mainFolder_=(s:String):Unit = _mainFolder=s
+  def analysisPolicy_=(a:AnalysisPolicy):Unit = _analysisPolicy=a
+  def versionPolicy_=(v:VersionPolicy):Unit = _versionPolicy=v
 }

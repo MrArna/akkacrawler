@@ -1,6 +1,7 @@
 package edu.uic.cs474.hw3.analysis
 
 import akka.actor.Actor
+import edu.uic.cs474.hw3.Config
 import edu.uic.cs474.hw3.graphing._
 import edu.uic.cs474.hw3.messages.{Analyze, DoneAnalyzing}
 import edu.uic.cs474.hw3.undestand.ReferenceKind
@@ -40,7 +41,10 @@ class ProjectAnalyzer extends Actor {
       graphListBuffer += ((repository, nVersionList, version, graph))
       println("Graph buffer size is " + graphListBuffer.size)
       if (graphListBuffer.size == nVersionList.size) {
-        NVersionsFirstLastAnalysis(nVersionList)
+        Config.analysisPolicy match {
+          case NVersionsFirstLast => NVersionsFirstLastAnalysis(nVersionList)
+          case NVersionsFirstLast => NVersionsTwoByTwoAnalysis(nVersionList)
+        }
       }
   }
 

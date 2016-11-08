@@ -7,7 +7,8 @@ import akka.http.scaladsl.model.{HttpMethods, HttpRequest, HttpResponse}
 import akka.stream.scaladsl.{Flow, Keep, RunnableGraph, Sink, Source}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import akka.util.ByteString
-import edu.uic.cs474.hw3.messages.{Parse, Start}
+import edu.uic.cs474.hw3.Config
+import edu.uic.cs474.hw3.messages.{GetLastMaxNVersions, Start}
 import org.json4s.jackson._
 
 import scala.concurrent.duration.Duration
@@ -62,26 +63,17 @@ class ProjectDownloader extends Actor with ActorLogging {
 
     for (url <- (urls \ "clone_url").values.asInstanceOf[List[String]])
     {
-      "git clone " + url  + " " + keyword + index !!;
-      sender ! GetLastMaxNVersions("tetris1", "/Users/Alessandro/Dropbox/Universita/UIC/OOP/marco_arnaboldi_alessandro_pappalardo_andrea_tirinzoni_hw3/tetris1", Config.maxNVersions)
-
-      sender ! Parse(keyword + index, keyword + index)
+      val command = "git clone " + url  + " " + keyword + index
+      val currentDirectory = new java.io.File(".").getCanonicalPath
+      command.!
+      sender ! GetLastMaxNVersions(keyword + index, currentDirectory + "tetris1", Config.maxNVersions)
       index = index + 1
     }
-
   }
 
-
-
-
   def receive = {
-
-
     case Start(nrProjects,keyword,lang) =>
       download(nrProjects,keyword,lang)
-
-
-
   }
 
 }

@@ -5,6 +5,5 @@ package edu.uic.cs474.hw3.analysis
   */
 sealed trait AnalysisPolicy
 
-case object NVersionsTwoByTwo
-case object NVersionsEveryM
-case object NVersionsFirstLast
+case object NVersionsTwoByTwo extends AnalysisPolicy
+case object NVersionsFirstLast extends AnalysisPolicy
