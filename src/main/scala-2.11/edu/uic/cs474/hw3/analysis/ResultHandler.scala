@@ -26,7 +26,5 @@ class ResultHandler extends Actor {
         println(diff)
       })
       println("#############################################################################################\n")
-
-      sender ! Stop
   }
 }

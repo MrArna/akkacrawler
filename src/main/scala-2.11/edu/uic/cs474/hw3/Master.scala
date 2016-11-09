@@ -2,11 +2,14 @@ package edu.uic.cs474.hw3
 
 import akka.actor._
 import edu.uic.cs474.hw3.analysis.{ProjectAnalyzer, ResultHandler}
-import edu.uic.cs474.hw3.graphing.{ProjectVersionGrapher, ProjectVersionGrapherRouter}
+import edu.uic.cs474.hw3.graphing.{EntityVertex, ProjectVersionGrapher, ReferenceEdge}
 import edu.uic.cs474.hw3.http.ProjectDownloader
 import edu.uic.cs474.hw3.parsing.{ProjectVersionParser, ProjectVersionParserRouter}
 import edu.uic.cs474.hw3.versioning.{ProjectVersionManager, ProjectVersionManagerRouter}
 import messages._
+import org.jgrapht.DirectedGraph
+
+import scala.collection.mutable.ListBuffer
 
 /**
   * The Master is the top level actor in the application. It starts three children: a ProjectDownloader,
@@ -21,9 +24,10 @@ class Master extends Actor {
   private var projectDownloader:ActorRef = _
   private var ProjectVersionManagerRouter:ActorRef = _
   private var projectVersionParserRouter:ActorRef = _
-  private var projectVersionGrapherRouter:ActorRef = _
+  private var projectVersionGrapher:ActorRef = _
   private var projectAnalyzer:ActorRef = _
   private var resultHandler:ActorRef = _
+  private var projectDataMap:scala.collection.mutable.Map[String, ListBuffer[(String, DirectedGraph[EntityVertex, ReferenceEdge])]] = _
 
   //Handles messages from other actors
   def receive = {
@@ -33,11 +37,11 @@ class Master extends Actor {
       projectDownloader = context.actorOf(Props[ProjectDownloader])
       ProjectVersionManagerRouter = context.actorOf(Props[ProjectVersionManagerRouter])
       projectVersionParserRouter = context.actorOf(Props[ProjectVersionParserRouter])
-      projectVersionGrapherRouter = context.actorOf(Props[ProjectVersionGrapher].withDispatcher("blocking-io-dispatcher"))
+      projectVersionGrapher = context.actorOf(Props[ProjectVersionGrapher].withDispatcher("blocking-io-dispatcher"))
       projectAnalyzer = context.actorOf(Props[ProjectAnalyzer])
       resultHandler = context.actorOf(Props[ResultHandler])
-
       projectDownloader ! Start(nrProjects, keyword, lang)
+      projectDataMap = scala.collection.mutable.Map[String, ListBuffer[(String, DirectedGraph[EntityVertex, ReferenceEdge])]]()
 
     //Stop the Master (recursively stops all children first)
     case Stop =>
@@ -53,7 +57,7 @@ class Master extends Actor {
         case a:ProjectVersionParser =>
           projectVersionParserRouter = context.actorOf(Props[ProjectVersionParserRouter])
         case a:ProjectVersionGrapher =>
-          projectVersionGrapherRouter = context.actorOf(Props[ProjectVersionGrapher].withDispatcher("blocking-io-dispatcher"))
+          projectVersionGrapher = context.actorOf(Props[ProjectVersionGrapher].withDispatcher("blocking-io-dispatcher"))
         case a:ProjectAnalyzer =>
           projectAnalyzer = context.actorOf(Props[ProjectAnalyzer])
         case a:ResultHandler =>
@@ -68,6 +72,7 @@ class Master extends Actor {
     //Forwards a Checkout message to the ProjectVersionManagerRouter
     case DoneGetLastMaxNVersions(repository, projectPath, nVersionList) =>
       println("Master received done get last max n versions")
+      projectDataMap.put(repository, ListBuffer[(String, DirectedGraph[EntityVertex, ReferenceEdge])]())
       nVersionList.foreach(version => ProjectVersionManagerRouter ! CheckoutVersion(repository, nVersionList, version, projectPath))
 
     //Forwards a Parse message to the ProjectVersionParserRouter
@@ -78,11 +83,15 @@ class Master extends Actor {
     //Forwards a Graph message to the ProjectVersionGrapherRouter
     case DoneParseVersion(repository, nVersionList, version, versionDbPath) =>
       println("Master received done parse version")
-      projectVersionGrapherRouter ! GraphVersionDb(repository, nVersionList, version, versionDbPath)
+      projectVersionGrapher ! GraphVersionDb(repository, nVersionList, version, versionDbPath)
 
     case DoneGraphVersionDb(repository, nVersionList, version, versionDbGraph) =>
       println("Master received done graph")
-      projectAnalyzer ! Analyze(repository, nVersionList, version, versionDbGraph)
+      var data = projectDataMap.get(repository).head
+      data.append((version, versionDbGraph))
+      if (data.size == nVersionList.size) {
+        projectAnalyzer ! Analyze(repository, nVersionList, data.toList)
+      }
 
     //Forwards a DoneAnalyzing message from the ProjectRouter to the ResultHandler
     case DoneAnalyzing(differences) =>

@@ -73,8 +73,8 @@ class ProjectVersionManager extends Actor {
     println("tags ref list is: " + tagsRefList)
     //take the corresponding commit hashes
     val tagsHashCommitList: List[String] = tagsRefList
-      .map(ref => Git.open(new File(projectDirPath)).log.add(ref.getPeeledObjectId).call().asScala.head.getName)
-    print(tagsHashCommitList)
+      .map(ref => ref.toString.substring(ref.toString.lastIndexOf("=") + 1, ref.toString.length - 1))
+    println("tags commit list is: " + tagsHashCommitList)
     sender ! DoneGetLastMaxNVersions(repository, projectDirPath, tagsHashCommitList)
   }
 

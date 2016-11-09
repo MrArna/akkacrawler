@@ -17,34 +17,30 @@ import scala.collection.mutable.ListBuffer
   */
 class ProjectAnalyzer extends Actor {
 
-  val graphListBuffer = ListBuffer.empty[(String, List[String], String, DirectedGraph[EntityVertex,ReferenceEdge])]
 
-  def NVersionsFirstLastAnalysis(nVersionList: List[String]): Unit = {
-    graphListBuffer.toList
+  def NVersionsFirstLastAnalysis(repository: String, nVersionList: List[String], versionGraphList: List[(String, DirectedGraph[EntityVertex, ReferenceEdge])]): Unit = {
+    versionGraphList
       .sliding(2) //there are only two by preconditions, but this way I get a list which is easy to index
-      .map(listOfTwo => analyze(listOfTwo(0)._1, listOfTwo(0)._3, listOfTwo(1)._3, listOfTwo(0)._4, listOfTwo(1)._4))
+      .map(listOfTwo => analyze(repository, listOfTwo(0)._1, listOfTwo(1)._1, listOfTwo(0)._2, listOfTwo(1)._2))
       .foreach(differences => sender ! DoneAnalyzing(differences))
   }
 
-  def NVersionsTwoByTwoAnalysis(nVersionList: List[String]): Unit = {
-    graphListBuffer.toList
-      .sortWith((firstTuple, secondTuple) => nVersionList.indexOf(firstTuple._3) < nVersionList.indexOf(secondTuple._3))
+  def NVersionsTwoByTwoAnalysis(repository: String, nVersionList: List[String], versionGraphList: List[(String, DirectedGraph[EntityVertex, ReferenceEdge])]): Unit = {
+    versionGraphList
+      .sortWith((firstTuple, secondTuple) => nVersionList.indexOf(firstTuple._1) < nVersionList.indexOf(secondTuple._1))
       .sliding(2)
-      .map(listOfTwo => analyze(listOfTwo(0)._1, listOfTwo(0)._3, listOfTwo(1)._3, listOfTwo(0)._4, listOfTwo(1)._4))
+      .map(listOfTwo => analyze(repository, listOfTwo(0)._1, listOfTwo(1)._1, listOfTwo(0)._2, listOfTwo(1)._2))
       .foreach(differences => sender ! DoneAnalyzing(differences))
   }
 
   def receive = {
-    case Analyze(repository, nVersionList, version, graph) =>
-      graphListBuffer += ((repository, nVersionList, version, graph))
-      println("Graph buffer size is " + graphListBuffer.size)
-      if (graphListBuffer.size == nVersionList.size) {
-        Config.analysisPolicy match {
-          case NVersionsFirstLast => NVersionsFirstLastAnalysis(nVersionList)
-          case NVersionsTwoByTwo => NVersionsTwoByTwoAnalysis(nVersionList)
-        }
+    case Analyze(repository, nVersionList, versionGraphList) =>
+      Config.analysisPolicy match {
+        case NVersionsFirstLast => NVersionsFirstLastAnalysis(repository, nVersionList, versionGraphList)
+        case NVersionsTwoByTwo => NVersionsTwoByTwoAnalysis(repository, nVersionList, versionGraphList)
       }
   }
+
 
   private def analyze(repository:String,version1:String,version2:String,graph1:DirectedGraph[EntityVertex, ReferenceEdge],graph2:DirectedGraph[EntityVertex, ReferenceEdge]) : Differences = {
 
