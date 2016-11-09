@@ -34,6 +34,7 @@ This command looks for two project with the keyword picasso and compares the mos
 
 After the system is run, the actors will start downloading projects, parsing them, analyzing them and finally showing the result. The latter is basically a list of functions that should be retested, together with the reason why they should be retested (a list of changes).
 
+Please note that all the files required by the analysis are put in a *tmp* subfolder. 
 
 ## Implementation Description
 
@@ -68,6 +69,8 @@ Once the response is obtained, it's parsed in order to obtain a JSON object. The
 used to navigate through the information it contains, in particular to retrieve the *clone_url* fields. These fields are then used to clone the repository via command line process invocation. 
 
 Once the repo is successfully cloned, the actor send a Versioning message where it indicates the location of the project and that its versioning can start.
+
+Please note that if the program tries to download a project that already exists in the *tmp* subfolder, it will throw an exception.
 
 ###Project Versioning
 
