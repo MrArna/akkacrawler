@@ -1,11 +1,10 @@
 package edu.uic.cs474.hw3.http
 
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
 import akka.testkit.{DefaultTimeout, ImplicitSender, TestActorRef, TestKit}
 import com.typesafe.config.ConfigFactory
-import edu.uic.cs474.hw3.messages.{Parse, Start}
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers, WordSpecLike}
+import edu.uic.cs474.hw3.messages.{GetLastMaxNVersions, Start}
+import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 
 /**
   * Created by Marco on 23/10/16.
@@ -25,7 +24,7 @@ class ProjectDownloaderTest extends TestKit(ActorSystem("DownloadTest",ConfigFac
 
       actorRef ! Start(1,"tetris","Java")
 
-      expectMsgClass(classOf[Parse])
+      expectMsgClass(classOf[GetLastMaxNVersions])
 
     }
 

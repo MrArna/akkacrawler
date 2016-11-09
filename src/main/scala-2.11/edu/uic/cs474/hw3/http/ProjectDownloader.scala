@@ -9,6 +9,8 @@ import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import akka.util.ByteString
 import edu.uic.cs474.hw3.Config
 import edu.uic.cs474.hw3.messages.{GetLastMaxNVersions, Start}
+import org.json4s.DefaultFormats
+import org.json4s.JsonAST.JString
 import org.json4s.jackson._
 
 import scala.concurrent.duration.Duration
@@ -23,6 +25,8 @@ import scala.sys.process._
 class ProjectDownloader extends Actor with ActorLogging {
 
   final implicit val materializer: ActorMaterializer = ActorMaterializer(ActorMaterializerSettings(context.system))
+  implicit val formats = DefaultFormats
+
 
   val http = Http(context.system)
 
@@ -58,13 +62,24 @@ class ProjectDownloader extends Actor with ActorLogging {
     val urls = json \\ "clone_url"
     var index = 1
 
-    for (url <- (urls \ "clone_url").values.asInstanceOf[List[String]])
+    if(urls.isInstanceOf[JString])
     {
-      "git clone " + url  + " " + keyword + index !!;
+      "git clone " + urls.extract[String] + " " + keyword + index !!;
       val currentDirectory = new java.io.File(".").getCanonicalPath
       sender ! GetLastMaxNVersions(keyword + index, currentDirectory + "/" + keyword + index, Config.maxNVersions)
-      index = index + 1
+
     }
+    else
+    {
+      for (url <- (urls \ "clone_url").values.asInstanceOf[List[String]])
+      {
+        "git clone " + url  + " " + keyword + index !!;
+        val currentDirectory = new java.io.File(".").getCanonicalPath
+        sender ! GetLastMaxNVersions(keyword + index, currentDirectory + "/" + keyword + index, Config.maxNVersions)
+        index = index + 1
+      }
+    }
+
   }
 
   def receive = {
