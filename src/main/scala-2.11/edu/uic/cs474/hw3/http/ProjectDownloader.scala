@@ -1,5 +1,7 @@
 package edu.uic.cs474.hw3.http
 
+import java.io.File
+
 import akka.NotUsed
 import akka.actor.{Actor, ActorLogging}
 import akka.http.scaladsl.Http
@@ -62,20 +64,28 @@ class ProjectDownloader extends Actor with ActorLogging {
     val urls = json \\ "clone_url"
     var index = 1
 
+    val currentDirectory = new java.io.File(".").getCanonicalPath
+    val tmpDir = new File(currentDirectory + "/tmp")
+
+    if(!tmpDir.exists())
+    {
+      tmpDir.mkdir()
+    }
+
+
     if(urls.isInstanceOf[JString])
     {
-      "git clone " + urls.extract[String] + " " + keyword + index !!;
+      "git clone " + urls.extract[String] + " tmp/" + keyword + index !!;
       val currentDirectory = new java.io.File(".").getCanonicalPath
-      sender ! GetLastMaxNVersions(keyword + index, currentDirectory + "/" + keyword + index, Config.maxNVersions)
+      sender ! GetLastMaxNVersions(keyword + index, currentDirectory + "/tmp/" + keyword + index, Config.maxNVersions)
 
     }
     else
     {
       for (url <- (urls \ "clone_url").values.asInstanceOf[List[String]])
       {
-        "git clone " + url  + " " + keyword + index !!;
-        val currentDirectory = new java.io.File(".").getCanonicalPath
-        sender ! GetLastMaxNVersions(keyword + index, currentDirectory + "/" + keyword + index, Config.maxNVersions)
+        "git clone " + url  + " tmp/" + keyword + index !!;
+        sender ! GetLastMaxNVersions(keyword + index, currentDirectory + "/tmp/" + keyword + index, Config.maxNVersions)
         index = index + 1
       }
     }
