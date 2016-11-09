@@ -1,23 +1,14 @@
 package edu.uic.cs474.hw3
 
 import akka.actor.{ActorSystem, Props}
-<<<<<<< HEAD
+
 import edu.uic.cs474.hw3.analysis.NVersionsFirstLast
 import edu.uic.cs474.hw3.messages.Start
-import edu.uic.cs474.hw3.versioning.CommitPolicy
-=======
-import com.scitools.understand.{Database, Understand}
-import edu.uic.cs474.hw3.analysis.{NVersionsFirstLast, NVersionsTwoByTwo}
-import edu.uic.cs474.hw3.graphing.ReferenceGraphBuilder
-import edu.uic.cs474.hw3.messages.Start
-import edu.uic.cs474.hw3.undestand.DbManager
 import edu.uic.cs474.hw3.versioning.{CommitPolicy, TagPolicy}
->>>>>>> a6586d7fca7e86827df8417705e6e4a5250d951c
 
 /**
   * The entry point of the application
   */
-<<<<<<< HEAD
 object Main {
 
   val usage =
@@ -63,31 +54,44 @@ object Main {
 
     val system = ActorSystem(
       "GithubAnalyzer")
-    val master = system.actorOf (Props[Master])
+    val master =system.actorOf (Props[Master])
     Config.
       maxProjectVersionManagers_=(options.get('vm).get.asInstanceOf[Int])
     Config.
-      maxProjectVersionParsers_=(options.get('vp).get.asInstanceOf[Int])
+      maxProjectVersionParsers_=(options.get('vp).get.
+        asInstanceOf[Int])
       Config.maxNVersions_=(options.get('v).get.asInstanceOf[Int])
     Config.
       analysisPolicy_=(NVersionsFirstLast)
     Config.
       versionPolicy_=(CommitPolicy)
       master !
-        Start(options.get('nrOfProjects).get.asInstanceOf[Int],
-              options.get('keyword).get.asInstanceOf[String],
-              options.get('lang).get.asInstanceOf[String]
+        Start(options.get('nrOfProjects).get.
+          asInstanceOf[Int],
+              options.get('keyword).get
+                .asInstanceOf[String],
+          options.get(
+
+            'lang).get.asInstanceOf[
+            String]
               )
   }
-=======
-object Main extends App {
-  val system = ActorSystem("GithubAnalyzer")
-  val master = system.actorOf(Props[Master])
-  Config.maxProjectVersionManagers_=(3)
+
+object Main
+  extends App {
+  val system = ActorSystem(
+    "GithubAnalyzer")
+  val master = system.
+    actorOf(Props[Master])
+  Config.
+    maxProjectVersionManagers_=(3
+    )
   Config.maxProjectVersionParsers_=(3)
   Config.maxNVersions_=(5)
-  Config.analysisPolicy_=(NVersionsFirstLast)
+  Config.
+    analysisPolicy_=(NVersionsFirstLast)
+
   Config.versionPolicy_=(TagPolicy)
   master ! Start(2, "picasso", "java")
->>>>>>> a6586d7fca7e86827df8417705e6e4a5250d951c
 }
+  }
