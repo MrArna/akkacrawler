@@ -9,6 +9,7 @@ import com.scitools.understand.{Database, Entity, Understand}
   */
 class DbManager(versionDbPath: String) {
 
+  //Call the Understand lib on the versionDbPath and return a list of entities corresponding to tke kind passed as parameter
   def getEntityListByTypeListFromDb(entityKind: EntityKind): List[Entity] = {
     this.synchronized {
       val db: Database = Understand.open(versionDbPath)

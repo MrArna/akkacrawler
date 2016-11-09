@@ -17,15 +17,17 @@ import sys.process._
   */
 class ProjectVersionParser extends Actor {
   override def receive: Receive = {
+    //generate an udb for specified version of the passed project
     case ParseVersion(repository, numberOfVersions, version, versionDirPath) => {
       val (outputDbPath: String, command: (String => String)) = getUnderstandCommand(versionDirPath)
       println(getSrcDirList(versionDirPath))
-      //call the command closed on the outputDbPath with each of the "src" folders for that version
+      //call the udb generation command with each of the "src" folders for this project version
       getSrcDirList(versionDirPath).foreach(f => command(f.getAbsolutePath).!!)
       sender ! DoneParseVersion(repository, numberOfVersions, version, outputDbPath)
     }
   }
 
+  //return the path where a udb file will be created, as well as a function to call to generate it there by passing a project dir path
   //versionDirPath must end without /
   def getUnderstandCommand(versionDirPath: String): (String, String => String) = {
     val versionDirName = FilenameUtils.getBaseName(versionDirPath)
@@ -36,7 +38,7 @@ class ProjectVersionParser extends Actor {
   }
 
   /*
-   * Get subdirs named "src"
+   * Get subdirs named "src" within the project folder
    */
   def getSrcDirList(versionDirPath: String): List[File] = {
     return FileUtils.listFilesAndDirs(new File(versionDirPath),

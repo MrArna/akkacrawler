@@ -26,6 +26,23 @@ class ProjectVersionManager extends Actor {
   val ShortHashLength = 7
   val Separator = "_"
 
+  override def receive: Receive = {
+    //get either the first and last of n, or the last n, of either tags or commits of the specified project
+    case GetLastMaxNVersions(repository, projectDirPath, n) =>
+      (Config.analysisPolicy, Config.versionPolicy) match {
+        case (NVersionsFirstLast, TagPolicy) => getTags(repository, projectDirPath, n, false)
+        case (NVersionsFirstLast, CommitPolicy) => getCommits(repository, projectDirPath, n, false)
+        case (NVersionsTwoByTwo, TagPolicy) => getTags(repository, projectDirPath, n, true)
+        case (NVersionsTwoByTwo, CommitPolicy) => getCommits(repository, projectDirPath, n, true)
+
+    }
+    //
+    case CheckoutVersion(repository, nVersionList, version, projectPath) =>
+      val versionDirPath = createVersionDir(projectPath, version)
+      checkoutVersion(versionDirPath, version)
+      sender ! DoneCheckoutVersion(repository, nVersionList, version, versionDirPath)
+  }
+  //getAll=true gives the commit hash of all the lat n commits, getAll=false gets the first and last of the last n commits
   def getCommits(repository: String, projectDirPath: String, n: Int, getAll: Boolean): Unit = {
     val commitList: Iterable[RevCommit] = Git.open(new File(projectDirPath)).log()
       .setMaxCount(n)
@@ -37,26 +54,10 @@ class ProjectVersionManager extends Actor {
     if (!getAll) {
       commitHashList = commitHashList.filter(ref => ref == commitHashList.head || ref == commitHashList.last)
     }
-    println("commits hash list is: " + commitHashList)
     sender ! DoneGetLastMaxNVersions(repository, projectDirPath, commitHashList)
   }
 
-  override def receive: Receive = {
-    case GetLastMaxNVersions(repository, projectDirPath, n) =>
-      (Config.analysisPolicy, Config.versionPolicy) match {
-        case (NVersionsFirstLast, TagPolicy) => getTags(repository, projectDirPath, n, false)
-        case (NVersionsFirstLast, CommitPolicy) => getCommits(repository, projectDirPath, n, false)
-        case (NVersionsTwoByTwo, TagPolicy) => getTags(repository, projectDirPath, n, true)
-        case (NVersionsTwoByTwo, CommitPolicy) => getCommits(repository, projectDirPath, n, true)
-
-    }
-    case CheckoutVersion(repository, nVersionList, version, projectPath) =>
-      val versionDirPath = createVersionDir(projectPath, version)
-      checkoutVersion(versionDirPath, version)
-      sender ! DoneCheckoutVersion(repository, nVersionList, version, versionDirPath)
-  }
-
-  //get all true gives all the n tags, false gets the first and last
+  //getAll=true gives the commit hash of all the lat n tags, getAll=false gets the first and last of the last n tags
   def getTags(repository: String, projectDirPath: String, n: Int, getAll: Boolean) = {
     //take the n newest tags
     var tagsRefList: List[Ref] = Git.open(new File(projectDirPath))
@@ -70,14 +71,13 @@ class ProjectVersionManager extends Actor {
     if (!getAll) {
       tagsRefList = tagsRefList.filter(ref => ref == tagsRefList.head || ref == tagsRefList.last)
     }
-    println("tags ref list is: " + tagsRefList)
     //take the corresponding commit hashes
     val tagsHashCommitList: List[String] = tagsRefList
       .map(ref => ref.toString.substring(ref.toString.lastIndexOf("=") + 1, ref.toString.length - 1))
-    println("tags commit list is: " + tagsHashCommitList)
     sender ! DoneGetLastMaxNVersions(repository, projectDirPath, tagsHashCommitList)
   }
 
+  //create a copy of the project directory to contain the specified version of that project
   //projectDirPath must not end with /
   def createVersionDir(projectDirPath: String, version: String): String = {
   val versionDirPath: String = FilenameUtils.concat(FilenameUtils.getFullPathNoEndSeparator(projectDirPath),
@@ -86,8 +86,8 @@ class ProjectVersionManager extends Actor {
     return versionDirPath
   }
 
+  //checkout the version specified by the commit hash within the directory passed as an argument
   def checkoutVersion(versionDirPath: String, commitId: String) = {
-    println("path %s version %s".format(versionDirPath, commitId))
     Process("git checkout --force %s".format(commitId), new File(versionDirPath)).!!
   }
 }
