@@ -5,7 +5,8 @@ import akka.actor.Actor.Receive
 import edu.uic.cs474.hw3.messages.{DoneAnalyzing, Stop}
 
 /**
-  * Created by andrea on 23/10/16.
+  * An actor to handle analysis results from the ProjectAnalyzers. This actor receives a DoneAnalyzing message, when
+  * an analysis is terminated, together with a set of differences, and shows them to the user.
   */
 class ResultHandler extends Actor {
 
