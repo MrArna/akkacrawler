@@ -2,7 +2,7 @@ package edu.uic.cs474.hw3.analysis
 
 import org.scalatest.FunSuite
 
-class DifferenceTest extends FunSuite {
+class DifferencesTest extends FunSuite {
 
   test("Test Differences") {
 

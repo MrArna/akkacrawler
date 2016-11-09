@@ -2,36 +2,44 @@
 
 # CS474 - Homework 3
 
------
+##Intro
+We interpreted the assignment as asking us to compare different commits of one each of them. This comes from the fact that one commit correspond to a patch to the program.
 
 ## How to run the code
 
-TODO come lo runniamo? sbt run?
+###Launch
 
-## Implementation Description
+Run from SBT by executing `sbt "run $ARGUMENTS"`, where *$ARGUMENTS* represents the set of arguments passed to the application.
 
-###Main Program
+###Arguments
 
-The main program receives some command line arguments. These are detailed as follows:
+The possible arguments are:
 
-+ **-n**: the number of projects to download.
-+ **-keyword**: the keyword to filter the downloaded projects.
-+ **-l**: the language the downloaded projects should be written in (as required, only *java* is supported).
-+ **-vm**: the number of version managers (specify more than one to speed up the process).
-+ **-vp**: the number of version parsers (specify more than one to speed up the process).
-+ **-v**: the number of versions to compare.
++ **-n** *: Int* the number of projects to download.
++ **-k** *: String* the keyword to filter the downloaded projects.
++ **-l** *: String*  the language the downloaded projects should be written in. As required, only *java* is supported.
++ **-vm** *: Int* the number of version managers (specify more than one to speed up the process).
++ **-vp** *: Int* the number of version parsers (specify more than one to speed up the process).
++ **-v** *: Int* the number of versions to compare.
++ **-pa** *: Int* the analysis policy, *1* for FirstLast, *2* for TwoByTwo.
++ **-pv** *: Int* the version policy, *1* for CommitPolicy, *2* for TagPolicy.
 
-The system can be run by passing such parameters. A suggested configuration is:
+###Suggested run
 
-TODO AGGIUNGERE CONFIG MIGLIORE PER TESTARE (penso n=5,keyword="picasso",l="java".vm=??,vp=??,v=2)
+A suggested command for launching the program is:
+
+`sbt "run -n 2 -k picasso -l java -vm 2 -vp 2 -v 5 -pa 2 -pv 1"`. 
+
+This command looks for two project with the keyword picasso and compares the most recent and the fifth less recent tag for each of them.
 
 After the system is run, the actors will start downloading projects, parsing them, analyzing them and finally showing the result. The latter is basically a list of functions that should be retested, together with the reason why they should be retested (a list of changes).
 
-##System Structure
 
-The system is built on top of the Akka library.
+## Implementation Description
 
-The semantically meaningful actors are:
+###System Overview
+
+The system is built on top of the Akka library. The semantically meaningful actors are:
 
 + **Master**: it manages all other actors and restart them in case of failure. It also keeps track of the progresses on the analysis of each project by storing intermediate data.
 
@@ -52,13 +60,14 @@ ProjectVersionGrapher cannot be parallelized because it requires to open the Und
 
 ###Project Download
 
-The *Project Download* actor is in charge of cloning the retrieved repositories into a temporary folder. This 
-actor is an Akka HTTP actor. It creates a HTTP request for the GitHub API server, then sends this request and wait 
-for the response. 
+The *Project Download* actor is in charge of cloning the retrieved repositories into a temporary folder. 
+
+This actor is an Akka HTTP actor. It creates a HTTP request for the GitHub API server, then sends this request and wait for the response. 
+
 Once the response is obtained, it's parsed in order to obtain a JSON object. The JSON object is
-used to navigate through the information it contains, in particular to retrieve the clone_url fields. These fields
-are then used to clone the repository via command line process invocation. Once the repo is successfully cloned, the 
-actor send a Parse message where it indicates the location of the project and that its parsing can start.
+used to navigate through the information it contains, in particular to retrieve the *clone_url* fields. These fields are then used to clone the repository via command line process invocation. 
+
+Once the repo is successfully cloned, the actor send a Versioning message where it indicates the location of the project and that its versioning can start.
 
 ###Project Versioning
 
@@ -100,11 +109,12 @@ The vertices are connected by the following kind of edges, each corresponding to
 The ProjectAnalyzer is the actor responsible for analyzing different versions of the same project. After a project is parsed and graphs for several versions are created, this information is forwarded to the ProjectAnalyzer, which can start the actual analysis. The goal of this actor is to produce a list of functions that need to be retested. In order to do this, different versions of each project are compared based on their graphs. If some meaningful change that affects a certain function is detected (e.g., the function calls a new function, uses a new field, etc.), the function is suggested as a candidate for testing. Given a set of graphs for each project, each corresponding to a different version (either commit or tag), this actor allows analyzing the differences between them. There are two policies for doing this:
 
 + **FirstLast**: given the v versions, it takes the most recent and the oldest of them and compars them.
+
 + **TwoByTwo**: compares the v versions two by two.
 
 This extended comparison allows the collection of interesting statistics about the code, like the number of times a function needed retest or the priority of each function to be retested. Notice that this was not required by our assignment. We implemented it as a bonus feature since we think it might be interesting to perform this kind of comparison. We think that it would be much better to suggest the developer a list of functions to retest together with the priorities on which parts of the code to focus on the most (i.e., those that has changed many times). 
 
-###Bonus Features
+##Bonus Features
 
 We implemented two different non-required bonus features that we think might be useful:
 
