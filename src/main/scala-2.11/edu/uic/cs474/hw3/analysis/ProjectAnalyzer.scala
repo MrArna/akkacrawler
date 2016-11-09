@@ -13,19 +13,22 @@ import collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
 
 /**
-  * Created by andrea on 23/10/16.
+  * An actor to analyze the differences between several versions of the same project. This actor receives an Analyze message
+  * with the graphs of N different project versions and compares them to find functions to be retested. It then forwards a
+  * DoneAnalyzing message with the analysis results to the ResultHandler.
   */
 class ProjectAnalyzer extends Actor {
 
-
-  def NVersionsFirstLastAnalysis(repository: String, nVersionList: List[String], versionGraphList: List[(String, DirectedGraph[EntityVertex, ReferenceEdge])]): Unit = {
+  //Analyze the first and last of N versions
+  private def NVersionsFirstLastAnalysis(repository: String, nVersionList: List[String], versionGraphList: List[(String, DirectedGraph[EntityVertex, ReferenceEdge])]): Unit = {
     versionGraphList
       .sliding(2) //there are only two by preconditions, but this way I get a list which is easy to index
       .map(listOfTwo => analyze(repository, listOfTwo(0)._1, listOfTwo(1)._1, listOfTwo(0)._2, listOfTwo(1)._2))
       .foreach(differences => sender ! DoneAnalyzing(differences))
   }
 
-  def NVersionsTwoByTwoAnalysis(repository: String, nVersionList: List[String], versionGraphList: List[(String, DirectedGraph[EntityVertex, ReferenceEdge])]): Unit = {
+  //Analyze N versions two by two
+  private def NVersionsTwoByTwoAnalysis(repository: String, nVersionList: List[String], versionGraphList: List[(String, DirectedGraph[EntityVertex, ReferenceEdge])]): Unit = {
     versionGraphList
       .sortWith((firstTuple, secondTuple) => nVersionList.indexOf(firstTuple._1) < nVersionList.indexOf(secondTuple._1))
       .sliding(2)
@@ -42,13 +45,18 @@ class ProjectAnalyzer extends Actor {
   }
 
 
+  //Analyze two different graphs
   private def analyze(repository:String,version1:String,version2:String,graph1:DirectedGraph[EntityVertex, ReferenceEdge],graph2:DirectedGraph[EntityVertex, ReferenceEdge]) : Differences = {
 
+    //Collection to keep track of the functions to retest
     val diffs = new Differences(repository,version1,version2)
 
+    //Edges introduced in the newer version
     val newEdges = getDifferentEdges(graph1,graph2)
+    //Edges removed from the older version
     val oldEdges = getDifferentEdges(graph2,graph1)
 
+    //Analyze the new edges
     newEdges.foreach(edge => {
 
       edge match {
@@ -75,6 +83,7 @@ class ProjectAnalyzer extends Actor {
       }
     })
 
+    //Analyze the old edges
     oldEdges.foreach(edge => {
 
       edge match {
@@ -97,18 +106,7 @@ class ProjectAnalyzer extends Actor {
     diffs
   }
 
-  private def getVertexEdges[T](graph:DirectedGraph[EntityVertex, ReferenceEdge],vertex:EntityVertex,direction:Direction) : Set[ReferenceEdge] = {
-
-    var edges = HashSet[ReferenceEdge]()
-
-    (if(direction==IN) graph.incomingEdgesOf(vertex) else graph.outgoingEdgesOf(vertex)).asScala.foreach(e => {
-      if(e.isInstanceOf[T])
-        edges += e
-    })
-
-    edges
-  }
-
+  //Get the different nodes between two graphs
   private def getDifferentNodes(graph1:DirectedGraph[EntityVertex, ReferenceEdge],graph2:DirectedGraph[EntityVertex, ReferenceEdge]) : Set[EntityVertex] = {
 
     var diffs = HashSet[EntityVertex]()
@@ -123,6 +121,7 @@ class ProjectAnalyzer extends Actor {
     diffs
   }
 
+  //Get the different edges between two graphs
   private def getDifferentEdges(graph1:DirectedGraph[EntityVertex, ReferenceEdge],graph2:DirectedGraph[EntityVertex, ReferenceEdge]) : Set[ReferenceEdge] = {
 
     var diffs = HashSet[ReferenceEdge]()
@@ -138,7 +137,3 @@ class ProjectAnalyzer extends Actor {
   }
 
 }
-
-sealed trait Direction
-case object IN extends Direction
-case object OUT extends Direction

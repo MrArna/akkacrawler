@@ -3,6 +3,7 @@ package edu.uic.cs474.hw3.analysis
 import akka.actor.{Actor, ActorSystem}
 import akka.actor.Status.Success
 import akka.testkit.TestActorRef
+import edu.uic.cs474.hw3.Config
 import edu.uic.cs474.hw3.graphing._
 import edu.uic.cs474.hw3.messages.{Analyze, DoneAnalyzing}
 import org.jgrapht.DirectedGraph
@@ -13,6 +14,8 @@ import org.scalatest.FunSuite
   * Created by andrea on 31/10/16.
   */
 class ProjectAnalyzerTest extends FunSuite {
+
+  Config.analysisPolicy = NVersionsFirstLast
 
   val graph1: DirectedGraph[EntityVertex, ReferenceEdge] =
     new DefaultDirectedGraph[EntityVertex, ReferenceEdge](new ClassBasedEdgeFactory[EntityVertex, ReferenceEdge](classOf[ReferenceEdge]))
@@ -63,22 +66,21 @@ class ProjectAnalyzerTest extends FunSuite {
   test("Test Analyzer") {
 
     implicit val system = ActorSystem()
-/*
+
     val analyzer = TestActorRef[ProjectAnalyzer]
     val printer = TestActorRef[ResultHandler]
     val receiver = TestActorRef(new Receiver(analyzer,printer))
-    receiver ! Analyze("Repository Name","V1","V2",graph1,graph2)
-    */
+    receiver ! Analyze("Repository Name",List("V1","V2"),List(("V1",graph1),("V2",graph2)))
 
   }
 }
 
-abstract class Receiver(ref:TestActorRef[ProjectAnalyzer],ref2:TestActorRef[ResultHandler]) extends Actor {
-/*
+class Receiver(ref:TestActorRef[ProjectAnalyzer],ref2:TestActorRef[ResultHandler]) extends Actor {
+
   def receive = {
 
-    case Analyze(repository,version1,version2,graphV1,graphV2) =>
-      ref ! Analyze(repository,version1,version2,graphV1,graphV2)
+    case Analyze(repository,nVersionList,versionGraphList) =>
+      ref ! Analyze(repository,nVersionList,versionGraphList)
     case DoneAnalyzing(differences) =>
       ref2 ! DoneAnalyzing(differences)
       assert(differences.repositoryName=="Repository Name")
@@ -93,5 +95,5 @@ abstract class Receiver(ref:TestActorRef[ProjectAnalyzer],ref2:TestActorRef[Resu
       assert(methods.contains("b"))
       assert(methods.contains("c"))
 
-  }*/
+  }
 }
