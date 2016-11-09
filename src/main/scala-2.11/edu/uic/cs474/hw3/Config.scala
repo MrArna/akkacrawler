@@ -12,8 +12,6 @@ object Config {
   private var _maxProjectVersionManagers:Int = _
   //Maximum number of project parsers to be instantiated by a single project handler
   private var _maxProjectVersionParsers:Int = _
-  //Maximum number of project parsers to be instantiated by a single project handler
-  private var _maxProjectVersionGraphers:Int = _
   //The total number of projects to be downloaded
   private var _numProjects:Int = _
   //The maximum number of versions of one project to checkout
@@ -30,7 +28,6 @@ object Config {
   //Getters
   def maxProjectVersionManagers = _maxProjectVersionManagers
   def maxProjectVersionParsers = _maxProjectVersionParsers
-  def maxProjectVersionGraphers = _maxProjectVersionGraphers
   def numProjects = _numProjects
   def maxNVersions:Int = _maxNVersions
   def language:String = _language
@@ -41,7 +38,6 @@ object Config {
   //Setters
   def maxProjectVersionManagers_=(n:Int):Unit = _maxProjectVersionManagers=n
   def maxProjectVersionParsers_=(n:Int):Unit = _maxProjectVersionParsers=n
-  def maxProjectVersionGraphers_=(n:Int):Unit = _maxProjectVersionGraphers=n
   def numProjects_=(n:Int):Unit = _numProjects=n
   def maxNVersions_=(n:Int):Unit = _maxNVersions=n
   def language_=(s:String):Unit = _language=s

@@ -21,9 +21,7 @@ class ProjectAnalyzer extends Actor {
 
   def NVersionsFirstLastAnalysis(nVersionList: List[String]): Unit = {
     graphListBuffer.toList
-      .filter(tuple => tuple._3 == nVersionList(0) || tuple._3 == nVersionList.last)
-      .take(2)
-      .sliding(2)
+      .sliding(2) //there are only two by preconditions, but this way I get a list which is easy to index
       .map(listOfTwo => analyze(listOfTwo(0)._1, listOfTwo(0)._3, listOfTwo(1)._3, listOfTwo(0)._4, listOfTwo(1)._4))
       .foreach(differences => sender ! DoneAnalyzing(differences))
   }
@@ -43,7 +41,7 @@ class ProjectAnalyzer extends Actor {
       if (graphListBuffer.size == nVersionList.size) {
         Config.analysisPolicy match {
           case NVersionsFirstLast => NVersionsFirstLastAnalysis(nVersionList)
-          case NVersionsFirstLast => NVersionsTwoByTwoAnalysis(nVersionList)
+          case NVersionsTwoByTwo => NVersionsTwoByTwoAnalysis(nVersionList)
         }
       }
   }

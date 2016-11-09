@@ -29,7 +29,7 @@ class Master extends Actor {
   def receive = {
 
     //Start the Master
-    case Start =>
+    case Start(nrProjects, keyword, lang) =>
       projectDownloader = context.actorOf(Props[ProjectDownloader])
       ProjectVersionManagerRouter = context.actorOf(Props[ProjectVersionManagerRouter])
       projectVersionParserRouter = context.actorOf(Props[ProjectVersionParserRouter])
@@ -37,7 +37,7 @@ class Master extends Actor {
       projectAnalyzer = context.actorOf(Props[ProjectAnalyzer])
       resultHandler = context.actorOf(Props[ResultHandler])
 
-      projectDownloader ! Start
+      projectDownloader ! Start(nrProjects, keyword, lang)
 
     //Stop the Master (recursively stops all children first)
     case Stop =>
@@ -72,19 +72,21 @@ class Master extends Actor {
 
     //Forwards a Parse message to the ProjectVersionParserRouter
     case DoneCheckoutVersion(repository, nVersionList, version, versionPath) =>
+      println("Master received done checkout version")
       projectVersionParserRouter ! ParseVersion(repository, nVersionList, version, versionPath)
 
     //Forwards a Graph message to the ProjectVersionGrapherRouter
     case DoneParseVersion(repository, nVersionList, version, versionDbPath) =>
+      println("Master received done parse version")
       projectVersionGrapherRouter ! GraphVersionDb(repository, nVersionList, version, versionDbPath)
 
-    //Forwards a Graph message to the ProjectVersionGrapherRouter
     case DoneGraphVersionDb(repository, nVersionList, version, versionDbGraph) =>
+      println("Master received done graph")
       projectAnalyzer ! Analyze(repository, nVersionList, version, versionDbGraph)
 
     //Forwards a DoneAnalyzing message from the ProjectRouter to the ResultHandler
     case DoneAnalyzing(differences) =>
-      print("Start result handler")
+      println("Master received done analyzing")
       resultHandler ! DoneAnalyzing(differences)
   }
 

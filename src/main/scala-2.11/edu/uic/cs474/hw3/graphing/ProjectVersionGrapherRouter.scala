@@ -12,7 +12,7 @@ import edu.uic.cs474.hw3.messages._
 class ProjectVersionGrapherRouter extends Actor {
 
   //Create the ProjectGrapher in the pool
-  private val routees = for(i <- 1 to Config.maxProjectVersionGraphers) yield {
+  private val routees = for(i <- 1 to 1) yield {
     val handler = context.actorOf(Props[ProjectVersionGrapher])
     context watch handler
     ActorRefRoutee(handler)
@@ -39,3 +39,4 @@ class ProjectVersionGrapherRouter extends Actor {
       router = router.addRoutee(newHandler)
   }
 }
+

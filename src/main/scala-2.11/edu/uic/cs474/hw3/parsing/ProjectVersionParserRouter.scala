@@ -23,7 +23,7 @@ class ProjectVersionParserRouter extends Actor {
 
   //Handle received messages
   def receive = {
-    //Forward ParseVersion to a free ProjectVersionCheckout
+    //Forward ParseVersion to a free ProjectVersionParser
     case version:ParseVersion =>
       router.route(version, sender)
 
@@ -31,7 +31,7 @@ class ProjectVersionParserRouter extends Actor {
     case done:DoneParseVersion =>
       context.parent ! done
 
-    //Handle unexpected termination of a ProjectVersionCheckout by restarting another one
+    //Handle unexpected termination of a ProjectVersionParser by restarting another one
     case Terminated(handler) =>
       router = router.removeRoutee(handler)
       val newHandler = context.actorOf(Props[ProjectVersionParser])

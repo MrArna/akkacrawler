@@ -21,13 +21,12 @@ class ProjectVersionParser extends Actor {
       val (outputDbPath: String, command: (String => String)) = getUnderstandCommand(versionDirPath)
       println(getSrcDirList(versionDirPath))
       //call the command closed on the outputDbPath with each of the "src" folders for that version
-      getSrcDirList(versionDirPath).foreach(f => command(f.getAbsolutePath)!)
-      //TODO: exception on bad exit code and check file exists
+      getSrcDirList(versionDirPath).foreach(f => command(f.getAbsolutePath).!!)
       sender ! DoneParseVersion(repository, numberOfVersions, version, outputDbPath)
     }
   }
 
-  //TODO fix: versionDirPath must end without /
+  //versionDirPath must end without /
   def getUnderstandCommand(versionDirPath: String): (String, String => String) = {
     val versionDirName = FilenameUtils.getBaseName(versionDirPath)
     val outputDbPath = FilenameUtils.concat(FilenameUtils.getFullPathNoEndSeparator(versionDirPath), versionDirName.concat(".udb"))

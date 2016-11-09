@@ -115,6 +115,7 @@ class ReferenceGraphBuilder(dbManager: DbManager) {
 
     buildGraph(List(FieldVariable, LocalVariable, Method, Class, Interface))
 
-    referenceGraph.edgeSet().asScala.foreach(edge => println(edge.source.name + " " + edge.kind + " " + edge.destination.name))
+    //print the graph
+    //referenceGraph.edgeSet().asScala.foreach(edge => println(edge.source.name + " " + edge.kind + " " + edge.destination.name))
   }
 }
