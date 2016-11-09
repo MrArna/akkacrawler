@@ -1,8 +1,7 @@
 package edu.uic.cs474.hw3
 
 import akka.actor.{ActorSystem, Props}
-
-import edu.uic.cs474.hw3.analysis.NVersionsFirstLast
+import edu.uic.cs474.hw3.analysis.{NVersionsFirstLast, NVersionsTwoByTwo}
 import edu.uic.cs474.hw3.messages.Start
 import edu.uic.cs474.hw3.versioning.{CommitPolicy, TagPolicy}
 
@@ -19,6 +18,8 @@ object Main {
             -vm <nr-of-version-manager>
             -vp <nr-of-version-parser>
             -v <nr-of-version>
+            -pa <analysis-policy> : 1 - NversionFirstLast ; 2 - TwoByTwo
+            -pv <version-policy>  : 1 - CommitPolicy; 2 -TagPolicy
               """
 
   type OptionMap = Map[Symbol, Any]
@@ -35,6 +36,8 @@ object Main {
       case "-vm" :: value :: tail => nextOption(map ++ Map('vm -> value.toInt), tail)
       case "-vp" :: value :: tail => nextOption(map ++ Map('vp -> value.toInt), tail)
       case "-v" :: value :: tail => nextOption(map ++ Map('v -> value.toInt), tail)
+      case "-pa" :: value :: tail => nextOption(map ++ Map('pa -> value.toInt), tail)
+      case "-pv" :: value :: tail => nextOption(map ++ Map('pv -> value.toInt), tail)
       case string :: opt2 :: tail if isSwitch(opt2) => nextOption(map ++ Map('infile -> string), list.tail)
       case string :: Nil =>  nextOption(map ++ Map('infile -> string), list.tail)
     }
@@ -52,20 +55,26 @@ object Main {
 
     val options = nextOption(Map(), arglist)
 
-    val system = ActorSystem(
-      "GithubAnalyzer")
+    val system = ActorSystem("GithubAnalyzer")
     val master =system.actorOf (Props[Master])
-    Config.
-      maxProjectVersionManagers_=(options.get('vm).get.asInstanceOf[Int])
-    Config.
-      maxProjectVersionParsers_=(options.get('vp).get.asInstanceOf[Int])
-      Config.maxNVersions_=(options.get('v).get.asInstanceOf[Int])
-    Config.analysisPolicy_=(NVersionsFirstLast)
-    Config.versionPolicy_=(CommitPolicy)
-      master ! Start( options.get('nrOfProjects).get.asInstanceOf[Int],
-                      options.get('keyword).get.asInstanceOf[String],
-                      options.get('lang).get.asInstanceOf[String]
-                    )
+    Config.maxProjectVersionManagers_=(options.get('vm).get.asInstanceOf[Int])
+    Config.maxProjectVersionParsers_=(options.get('vp).get.asInstanceOf[Int])
+    Config.maxNVersions_=(options.get('v).get.asInstanceOf[Int])
+
+    options.get('pv).get.asInstanceOf[Int] match {
+      case 1 => Config.analysisPolicy_=(NVersionsFirstLast)
+      case 2 => Config.analysisPolicy_=(NVersionsTwoByTwo)
+    }
+
+    options.get('pa).get.asInstanceOf[Int] match {
+      case 1 => Config.versionPolicy_=(CommitPolicy)
+      case 2 => Config.versionPolicy_=(TagPolicy)
+    }
+
+    master ! Start( options.get('nrOfProjects).get.asInstanceOf[Int],
+                    options.get('keyword).get.asInstanceOf[String],
+                    options.get('lang).get.asInstanceOf[String]
+                  )
   }
 
   }
