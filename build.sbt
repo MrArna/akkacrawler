@@ -24,6 +24,12 @@ libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.0"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 
+// https://mvnrepository.com/artifact/org.eclipse.jgit/org.eclipse.jgit
+libraryDependencies += "org.eclipse.jgit" % "org.eclipse.jgit" % "4.5.0.201609210915-r"
+
+// https://mvnrepository.com/artifact/commons-io/commons-io
+libraryDependencies += "commons-io" % "commons-io" % "2.5"
+
 parallelExecution in Test := false
 
-mainClass in assembly := Some("edu.uic.cs474.hw3.Main")
+//mainClass in assembly := Some("edu.uic.cs474.hw3.Main")
