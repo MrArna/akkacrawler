@@ -30,8 +30,8 @@ object Main {
     list match {
       case Nil => map
       case "-n" :: value :: tail => nextOption(map ++ Map('nrOfProjects -> value.toInt), tail)
-      case "-k" :: value :: tail => nextOption(map ++ Map('keyword -> value.toInt), tail)
-      case "-l" :: value :: tail => nextOption(map ++ Map('lang -> value.toInt), tail)
+      case "-k" :: value :: tail => nextOption(map ++ Map('keyword -> value.toString), tail)
+      case "-l" :: value :: tail => nextOption(map ++ Map('lang -> value.toString), tail)
       case "-vm" :: value :: tail => nextOption(map ++ Map('vm -> value.toInt), tail)
       case "-vp" :: value :: tail => nextOption(map ++ Map('vp -> value.toInt), tail)
       case "-v" :: value :: tail => nextOption(map ++ Map('v -> value.toInt), tail)
@@ -58,23 +58,14 @@ object Main {
     Config.
       maxProjectVersionManagers_=(options.get('vm).get.asInstanceOf[Int])
     Config.
-      maxProjectVersionParsers_=(options.get('vp).get.
-        asInstanceOf[Int])
+      maxProjectVersionParsers_=(options.get('vp).get.asInstanceOf[Int])
       Config.maxNVersions_=(options.get('v).get.asInstanceOf[Int])
-    Config.
-      analysisPolicy_=(NVersionsFirstLast)
-    Config.
-      versionPolicy_=(CommitPolicy)
-      master !
-        Start(options.get('nrOfProjects).get.
-          asInstanceOf[Int],
-              options.get('keyword).get
-                .asInstanceOf[String],
-          options.get(
-
-            'lang).get.asInstanceOf[
-            String]
-              )
+    Config.analysisPolicy_=(NVersionsFirstLast)
+    Config.versionPolicy_=(CommitPolicy)
+      master ! Start( options.get('nrOfProjects).get.asInstanceOf[Int],
+                      options.get('keyword).get.asInstanceOf[String],
+                      options.get('lang).get.asInstanceOf[String]
+                    )
   }
 
   }
