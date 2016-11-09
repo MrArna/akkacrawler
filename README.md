@@ -39,7 +39,12 @@ The actors are:
 
 ###Project Download
 
-TODO
+The Project Download actor is in charge of cloning the retrieved repositories into a temporary folder. This 
+actor is an Akka HTTP actor. It creates a HTTP request for the GitHub API server, then sends this request and wait 
+for the response. Once the response is obtained, it's parsed in order to obtain a JSON object. The JSON object is
+used to navigate through the information it contains, in particular to retrieve the clone_url fields. These fields
+are then used to clone the repository via command line process invocation. Once the repo is successfully cloned, the 
+actor send a Parse message where it indicates the location of the project and that its parsing can start.
 
 ###Project Parsing
 
