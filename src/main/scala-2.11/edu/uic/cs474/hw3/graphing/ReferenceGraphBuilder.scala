@@ -14,7 +14,7 @@ class ReferenceGraphBuilder(dbManager: DbManager) {
   var referenceGraph: DirectedGraph[EntityVertex, ReferenceEdge] =
     new DefaultDirectedGraph[EntityVertex, ReferenceEdge](new ClassBasedEdgeFactory[EntityVertex, ReferenceEdge](classOf[ReferenceEdge]))
 
-  def build = {
+  def buildGraph(entityKindList: List[EntityKind]): Unit = {
 
     implicit class Regex(sc: StringContext) {
       def r = new util.matching.Regex(sc.parts.mkString, sc.parts.tail.map(_ => "x"): _*)
@@ -101,21 +101,14 @@ class ReferenceGraphBuilder(dbManager: DbManager) {
       case _ => println("Unknown entity " + entity.kind().toString())
     }
 
-    def buildGraph(entityKindList: List[EntityKind]): Unit = {
-      entityKindList
-        .map(entityKind => dbManager.getEntityListByTypeListFromDb(entityKind))
-        .map(entityList => entityList.filterNot(e => e.longname(true).startsWith(Java.prefix) || e.longname(true).startsWith(Sun.prefix))
-          .foreach(entity => addEntityToGraph(entity)))
-      entityKindList
-        .filterNot((entityKind => entityKind == LocalVariable || entityKind == FieldVariable))
-        .map(entityKind => dbManager.getEntityListByTypeListFromDb(entityKind))
-        .map(entityList => entityList.filterNot(e => e.longname(true).startsWith(Java.prefix) || e.longname(true).startsWith(Sun.prefix))
-          .foreach(entity => addReferencesToGraph(entity)))
-    }
-
-    buildGraph(List(FieldVariable, LocalVariable, Method, Class, Interface))
-
-    //print the graph
-    //referenceGraph.edgeSet().asScala.foreach(edge => println(edge.source.name + " " + edge.kind + " " + edge.destination.name))
+    entityKindList
+      .map(entityKind => dbManager.getEntityListByTypeListFromDb(entityKind))
+      .map(entityList => entityList.filterNot(e => e.longname(true).startsWith(Java.prefix) || e.longname(true).startsWith(Sun.prefix))
+        .foreach(entity => addEntityToGraph(entity)))
+    entityKindList
+      .filterNot((entityKind => entityKind == LocalVariable || entityKind == FieldVariable))
+      .map(entityKind => dbManager.getEntityListByTypeListFromDb(entityKind))
+      .map(entityList => entityList.filterNot(e => e.longname(true).startsWith(Java.prefix) || e.longname(true).startsWith(Sun.prefix))
+        .foreach(entity => addReferencesToGraph(entity)))
   }
 }

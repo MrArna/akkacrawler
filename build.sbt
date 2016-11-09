@@ -24,6 +24,8 @@ libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.0"
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0" % "test"
 
+libraryDependencies += "org.mockito" % "mockito-all" % "1.8.5"
+
 // https://mvnrepository.com/artifact/org.eclipse.jgit/org.eclipse.jgit
 libraryDependencies += "org.eclipse.jgit" % "org.eclipse.jgit" % "4.5.0.201609210915-r"
 
