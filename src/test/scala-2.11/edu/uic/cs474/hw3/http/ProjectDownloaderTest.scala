@@ -1,35 +1,35 @@
 package edu.uic.cs474.hw3.http
 
 import akka.actor.ActorSystem
-import akka.actor.Status.Success
 import akka.stream.ActorMaterializer
-import akka.testkit.TestActorRef
-import edu.uic.cs474.hw3.messages.Start
-import org.scalatest.FunSuite
+import akka.testkit.{DefaultTimeout, ImplicitSender, TestActorRef, TestKit}
+import com.typesafe.config.ConfigFactory
+import edu.uic.cs474.hw3.messages.{Parse, Start}
+import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers, WordSpecLike}
 
 /**
   * Created by Marco on 23/10/16.
   */
-class ProjectDownloaderTest extends FunSuite
+class ProjectDownloaderTest extends TestKit(ActorSystem("DownloadTest",ConfigFactory.parseString(TestKitUsageSpec.config)))
+  with DefaultTimeout
+  with ImplicitSender
+  with WordSpecLike
+  with Matchers
+  with BeforeAndAfterAll
 {
 
-  test("Http Connection")
-  {
-
-    implicit val system = ActorSystem()
-    implicit val materializer = ActorMaterializer()
+  "A Downloader" should {
+    "clone the repo and return a parse message" in {
+      val actorRef = TestActorRef[ProjectDownloader]
 
 
-    /*val responseFuture: Future[HttpResponse] =
-      Http().singleRequest(HttpRequest(uri = "https://api.github.com/users/octocat/orgs"))
+      actorRef ! Start(1,"tetris","Java")
 
-    println(responseFuture)*/
+      expectMsgClass(classOf[Parse])
 
-
-    val actorRef = TestActorRef(new ProjectDownloader)
-
-    actorRef ! Start(2,"tetris","Java")
+    }
 
   }
 
 }
+
