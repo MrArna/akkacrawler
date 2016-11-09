@@ -14,12 +14,12 @@ TODO come lo runniamo? sbt run?
 
 The main program receives some command line arguments. These are detailed as follows:
 
-+n: the number of projects to download;
-+keyword: the keyword to filter the downloaded projects;
-+l: the language the downloaded projects should be written in;
-+vm: the number of version managers (specify more than one to speed up the process;
-+vp: the number of version parsers (specify more than one to speed up the process;
-+v: the number of versions to compare.
++ n: the number of projects to download;
++ keyword: the keyword to filter the downloaded projects;
++ l: the language the downloaded projects should be written in;
++ vm: the number of version managers (specify more than one to speed up the process;
++ vp: the number of version parsers (specify more than one to speed up the process;
++ v: the number of versions to compare.
 
 The system can be run by passing such parameters. A suggested configuration is:
 
