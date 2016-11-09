@@ -37,6 +37,8 @@ class ProjectDownloader extends Actor with ActorLogging {
     val http = Http(context.system)
     import HttpMethods._
 
+
+    //initialize the HTTP request
     val userData = ByteString("abc")
 
     val request:HttpRequest=
@@ -45,25 +47,33 @@ class ProjectDownloader extends Actor with ActorLogging {
         uri = "https://api.github.com/search/repositories?q=" + keyword + "+language:" + lang + "&per_page=" + numberOfProject
       )
 
+    //make the request
     val fut : Future[HttpResponse] = http.singleRequest(request)
 
+    //wait for response
     val response = Await.result(fut,Duration.Inf)
 
+    //move response data in a flow in order to retrieve a string
     val src : Source[ByteString,Any] = response.entity.dataBytes
     val stringFlow : Flow[ByteString,String, NotUsed] = Flow[ByteString].map(chunk => chunk.utf8String)
     val sink : Sink[String,Future[String]] = Sink.fold("")(_ + _)
 
+    //run the flow
     val content : RunnableGraph[Future[String]] = (src via stringFlow toMat sink) (Keep.right)
 
     val aggregation : Future[String] = content.run()
 
+    //wait for the completion of the aggregation flow
     Await.result(aggregation,Duration.Inf)
 
+    //response into  json
     val json = parseJson(aggregation.value.get.get)
 
+    //find URLs in json
     val urls = json \\ "clone_url"
     var index = 1
 
+    //create tmp directory if not exists
     val currentDirectory = new java.io.File(".").getCanonicalPath
     val tmpDir = new File(currentDirectory + "/tmp")
 
@@ -72,7 +82,7 @@ class ProjectDownloader extends Actor with ActorLogging {
       tmpDir.mkdir()
     }
 
-
+    //clone repo in tmp directory using the URLs retrieved
     if(urls.isInstanceOf[JString])
     {
       "git clone " + urls.extract[String] + " tmp/" + keyword + index !!;
