@@ -76,22 +76,5 @@ object Main {
             String]
               )
   }
-
-object Main
-  extends App {
-  val system = ActorSystem(
-    "GithubAnalyzer")
-  val master = system.
-    actorOf(Props[Master])
-  Config.
-    maxProjectVersionManagers_=(3
-    )
-  Config.maxProjectVersionParsers_=(3)
-  Config.maxNVersions_=(5)
-  Config.
-    analysisPolicy_=(NVersionsFirstLast)
-
-  Config.versionPolicy_=(TagPolicy)
-  master ! Start(2, "picasso", "java")
-}
+  
   }
