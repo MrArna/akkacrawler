@@ -34,10 +34,7 @@ case class DoneGraphVersionDb(repository:String,
                               versionDbGraph: DirectedGraph[EntityVertex, ReferenceEdge]) extends Message
 
 //Tell a ProjectAnalyzer to analyze the project's graphs
-case class Analyze(repository: String,
-                   nVersionList:List[String],
-                   version: String,
-                   graph:DirectedGraph[EntityVertex, ReferenceEdge]) extends Message
+case class Analyze(repository: String, nVersionList: List[String], versionGraphList: List[(String, DirectedGraph[EntityVertex, ReferenceEdge])]) extends Message
 
 //Tell the ResultHandler that the analysis is complete
 case class DoneAnalyzing(differences:Differences) extends Message
