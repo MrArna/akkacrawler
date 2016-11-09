@@ -29,11 +29,7 @@ class Master extends Actor {
   def receive = {
 
     //Start the Master
-<<<<<<< HEAD
-    case Start(nrProjects,keyword,lang) =>
-=======
     case Start(nrProjects, keyword, lang) =>
->>>>>>> 43bf834282c229a7f091940d4b09b56c83932914
       projectDownloader = context.actorOf(Props[ProjectDownloader])
       ProjectVersionManagerRouter = context.actorOf(Props[ProjectVersionManagerRouter])
       projectVersionParserRouter = context.actorOf(Props[ProjectVersionParserRouter])
@@ -41,12 +37,8 @@ class Master extends Actor {
       projectAnalyzer = context.actorOf(Props[ProjectAnalyzer])
       resultHandler = context.actorOf(Props[ResultHandler])
 
-<<<<<<< HEAD
-      projectDownloader ! Start(nrProjects,keyword,lang)
-=======
       projectDownloader ! Start(nrProjects, keyword, lang)
 
->>>>>>> 43bf834282c229a7f091940d4b09b56c83932914
     //Stop the Master (recursively stops all children first)
     case Stop =>
       context stop self
