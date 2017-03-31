@@ -1,9 +1,10 @@
 -----
-
-# CS474 - Homework 3
+Akka CRAWLER
+# 
 
 ##Intro
-We interpreted the assignment as asking us to compare different commits of one each of them. This comes from the fact that one commit correspond to a patch to the program.
+Developed as CS474 @ UIC - Homework 3
+We interpreted the assignment as asking us to compare different commits of one each of them. This comes from the fact that one commit correspond to a patch to the program. 
 
 ## How to run the code
 
