@@ -1,18 +1,18 @@
 -----
-Akka CRAWLER
-# 
 
-##Intro
+# Akka CRAWLER
+
+## Intro
 Developed as CS474 @ UIC - Homework 3
 We interpreted the assignment as asking us to compare different commits of one each of them. This comes from the fact that one commit correspond to a patch to the program. 
 
 ## How to run the code
 
-###Launch
+### Launch
 
 Run from SBT by executing `sbt "run $ARGUMENTS"`, where *$ARGUMENTS* represents the set of arguments passed to the application.
 
-###Arguments
+### Arguments
 
 The possible arguments are:
 
@@ -25,7 +25,7 @@ The possible arguments are:
 + **-pa** *: Int* the analysis policy, *1* for FirstLast, *2* for TwoByTwo.
 + **-pv** *: Int* the version policy, *1* for CommitPolicy, *2* for TagPolicy.
 
-###Suggested run
+### Suggested run
 
 A suggested command for launching the program is:
 
@@ -39,7 +39,7 @@ Please note that all the files required by the analysis are put in a *tmp* subfo
 
 ## Implementation Description
 
-###System Overview
+### System Overview
 
 The system is built on top of the Akka library. The semantically meaningful actors are:
 
@@ -60,7 +60,7 @@ The system is built on top of the Akka library. The semantically meaningful acto
 *ProjectVersionManager* and *ProjectVersionParser* are managed in pools by **ProjectVersionManagerRouter** and **ProjectVersionParserRouter**. The size of the pools is determined by the launching parameters. 
 ProjectVersionGrapher cannot be parallelized because it requires to open the Understand database through it's native library, which has proven to be *not* thread safe.
 
-###Project Download
+### Project Download
 
 The *Project Download* actor is in charge of cloning the retrieved repositories into a temporary folder. 
 
@@ -73,7 +73,7 @@ Once the repo is successfully cloned, the actor send a Versioning message where 
 
 Please note that if the program tries to download a project that already exists in the *tmp* subfolder, it will throw an exception.
 
-###Project Versioning
+### Project Versioning
 
 The *Project Version Manager* actor takes a folder containing a cloned repository. Then, according to the combination of selected the policies, it takes the commits corresponding to the desired versions and generates a folder containing each of the. The two types of determining policies are:
 
@@ -81,11 +81,11 @@ The *Project Version Manager* actor takes a folder containing a cloned repositor
 
 + **AnalysisPolicy**: it determines how many version should be taken. *FirstLast* takes only the oldest and the newest out of v version, with v passed a parameter when the program is run and version defined as specified by the previous policy. *TwoByTwo* takes all of the v versions.
 
-###Project Parsing
+### Project Parsing
 
 *The Project Parsing* actor generates an Undestand database for a given source folder, i.e. a version of a project.
 
-###Project Graphing
+### Project Graphing
 
 The *Project Graphing* generates a graph for a given Understand database. The graph is a directed graph containing the following kind of vertices, each corresponding to an entity kind:
 
@@ -108,7 +108,7 @@ The vertices are connected by the following kind of edges, each corresponding to
 + Set Local Variable
 + Use Local Variable
 
-###Project Analysis
+### Project Analysis
 
 The ProjectAnalyzer is the actor responsible for analyzing different versions of the same project. After a project is parsed and graphs for several versions are created, this information is forwarded to the ProjectAnalyzer, which can start the actual analysis. The goal of this actor is to produce a list of functions that need to be retested. In order to do this, different versions of each project are compared based on their graphs. If some meaningful change that affects a certain function is detected (e.g., the function calls a new function, uses a new field, etc.), the function is suggested as a candidate for testing. Given a set of graphs for each project, each corresponding to a different version (either commit or tag), this actor allows analyzing the differences between them. There are two policies for doing this:
 
@@ -118,7 +118,7 @@ The ProjectAnalyzer is the actor responsible for analyzing different versions of
 
 This extended comparison allows the collection of interesting statistics about the code, like the number of times a function needed retest or the priority of each function to be retested. Notice that this was not required by our assignment. We implemented it as a bonus feature since we think it might be interesting to perform this kind of comparison. We think that it would be much better to suggest the developer a list of functions to retest together with the priorities on which parts of the code to focus on the most (i.e., those that has changed many times). 
 
-##Bonus Features
+## Bonus Features
 
 We implemented two different non-required bonus features that we think might be useful:
 
